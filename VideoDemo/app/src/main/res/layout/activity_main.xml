@@ -7,12 +7,10 @@
     android:background="@color/colorPrimary"
     android:orientation="vertical"
     tools:context="video.hc.com.videodemo.MainActivity">
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp"
         android:weightSum="1">
 
         <TextView
@@ -93,10 +91,11 @@
                 />
             <Button
                 android:id="@+id/button"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/test"
                 android:layout_centerHorizontal="true"
+                android:background="@drawable/tiyan"
                 android:text="@string/app_video_share" />
         </RelativeLayout>
     </LinearLayout>

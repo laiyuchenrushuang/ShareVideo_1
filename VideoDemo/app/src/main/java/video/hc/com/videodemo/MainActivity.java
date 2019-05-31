@@ -32,10 +32,11 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import video.hc.com.videodemo.base.BeseActivity;
 import video.hc.com.videodemo.upload.HttpService;
 import video.hc.com.videodemo.utils.TimeUtils;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnVideoSizeChangedListener {
+public class MainActivity extends BeseActivity implements View.OnClickListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnVideoSizeChangedListener {
     @BindView(R.id.video)
     SurfaceView mSurfaceView;
     @BindView(R.id.button_play)
@@ -97,10 +98,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
                 Log.i("lylog", "SurfaceHolder 被销毁");
-//                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-//                    currentPosition = mediaPlayer.getCurrentPosition();
-//                    mediaPlayer.pause();
-//                }
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    currentPosition = mediaPlayer.getCurrentPosition();
+                    mediaPlayer.stop();
+                }
             }
         });
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -211,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mediaPlayer.pause();
                 break;
             case R.id.button:
+                mediaPlayer.stop();
                 loadThirdWeb();
                 break;
         }
@@ -242,15 +244,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Display display = getWindowManager().getDefaultDisplay();
         int screenW = display.getWidth();
         int screenH = (int) (screenW * (((float) h) / w));
-        Log.i("lylog", " media w = " + w + "  h =" + h + " screeb w = " + screenW + " h = " + screenH);
         mSurfaceView.getHolder().setFixedSize(screenW, screenH);
     }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+
         mapPosition++;
         if (urlList.size() > mapPosition) {
             lunboFlag = true;
+            Log.d("lylog","onCompletion mapPosition ="+mapPosition);
             playVideo(urlList.get(mapPosition).get("url"));
         } else {
             mapPosition = 0;
@@ -278,7 +281,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
-        Log.d("lylog", "percent = " + percent);
         mPrecent = percent;
         seekBar.setProgress(percent);
     }
@@ -344,17 +346,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onDestroy() {
-        Log.d("lylog", "onDestroy");
+        Log.d("lylog1", "onDestroy");
         mediaPlayer.release();
         lunboFlag = false;
         currentPosition = 0;
         mapPosition = 0;
+        mPrecent = 0;
         super.onDestroy();
     }
 
     @Override
     protected void onPause() {
-        mediaPlayer.pause();
+        Log.d("lylog1", " onPause ");
+        mediaPlayer.stop();
         currentPosition = mediaPlayer.getCurrentPosition();
         super.onPause();
     }
@@ -362,8 +366,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         bt_play.setVisibility(View.VISIBLE);
-        Log.d("lylog", " mPrecent =" + mPrecent);
-
+        Log.d("lylog1", " onResume mPrecent =" + mPrecent);
         seekBar.setProgress(mPrecent);
         mediaPlayer.seekTo(currentPosition);
         super.onResume();
