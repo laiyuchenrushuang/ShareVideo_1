@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">VideoDemo</string>
+    <string name="app_video_wellcome">主题</string>
+    <string name="app_video_share">立即体验</string>
+</resources>
