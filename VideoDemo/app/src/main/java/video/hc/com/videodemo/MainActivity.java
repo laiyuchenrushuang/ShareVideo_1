@@ -2,27 +2,23 @@ package video.hc.com.videodemo;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.RelativeLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -32,17 +28,19 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import pl.droidsonroids.gif.GifImageView;
 import video.hc.com.videodemo.base.BeseActivity;
 import video.hc.com.videodemo.upload.HttpService;
 import video.hc.com.videodemo.utils.TimeUtils;
+import video.hc.com.videodemo.utils.Utils;
 
-public class MainActivity extends BeseActivity implements View.OnClickListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnVideoSizeChangedListener {
+public class MainActivity extends BeseActivity implements View.OnClickListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener {
     @BindView(R.id.video)
     SurfaceView mSurfaceView;
     @BindView(R.id.button_play)
-    Button bt_play;
+    ImageView bt_play;
     @BindView(R.id.button_pause)
-    Button bt_pause;
+    ImageView bt_pause;
     @BindView(R.id.video_progress)
     SeekBar seekBar;
     @BindView(R.id.video_time)
@@ -50,7 +48,16 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     @BindView(R.id.start_time)
     TextView startTime;
     @BindView(R.id.button)
-    Button button;
+    ImageView button;
+
+    @BindView(R.id.image_progress)
+    ImageView image_progress;
+    @BindView(R.id.gif_networkwait)
+    GifImageView gif_networkwait;
+    @BindView(R.id.iv_error)
+    LinearLayout iv_error;
+    @BindView(R.id.txt_error)
+    TextView txt_error;
 
     private static int currentPosition = 0;
     private SurfaceHolder surfaceHolder;
@@ -58,6 +65,8 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     private int surfaceWidth, surfaceHeight;
     MediaPlayer mediaPlayer;
     ArrayList<Map<String, String>> urlList = new ArrayList();
+    int[] ivProgresslist = {R.mipmap.progress1, R.mipmap.progress2, R.mipmap.progress3, R.mipmap.progress4, R.mipmap.progress5};
+    int ivProgressFlag = 0;
     private static int mPrecent = 0;
     private static boolean lunboFlag = false;
     private static int mapPosition = 0;
@@ -67,9 +76,6 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        if (PackageManager.PERMISSION_GRANTED != ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            ActivityCompat.requestPermissions(this, mPermissions, 10);
-        }
         urlList = HttpService.getUrlList();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -78,6 +84,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     }
 
     private void initView() {
+//        setDataIVProgress();
         mediaPlayer = new MediaPlayer();
         surfaceHolder = mSurfaceView.getHolder();
         surfaceHolder.addCallback(new SurfaceHolder.Callback() {
@@ -123,12 +130,16 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
 
         mSurfaceView.setOnClickListener(this);
         seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
-        mediaPlayer.setOnVideoSizeChangedListener(this);
+        iv_error.setOnClickListener(this);
+        //mediaPlayer.setOnVideoSizeChangedListener(this);
     }
 
     private void playVideo(String url) {
         // 重置mediaPaly,建议在初始滑mediaplay立即调用。
         mediaPlayer.reset();
+        gif_networkwait.setVisibility(View.VISIBLE);
+        bt_play.setVisibility(View.INVISIBLE);
+        iv_error.setVisibility(View.INVISIBLE);
         // 设置声音效果
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         // 设置播放完成监听
@@ -181,7 +192,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                             }
                         }
                     }).start();
-                } else {
+                } else if (Utils.canPlay){
                     bt_play.setVisibility(View.VISIBLE);
                     seekBar.setVisibility(View.VISIBLE);
                     videoTime.setVisibility(View.VISIBLE);
@@ -203,6 +214,26 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                             }
                         }
                     }).start();
+                }else {
+                    seekBar.setVisibility(View.VISIBLE);
+                    videoTime.setVisibility(View.VISIBLE);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(2000);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        seekBar.setVisibility(View.INVISIBLE);
+                                        videoTime.setVisibility(View.INVISIBLE);
+                                    }
+                                });
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
                 }
                 break;
             case R.id.button_pause:
@@ -214,6 +245,10 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
             case R.id.button:
                 mediaPlayer.stop();
                 loadThirdWeb();
+                break;
+            case R.id.iv_error:
+                playVideo(urlList.get(mapPosition).get("url"));
+                mediaPlayer.seekTo(currentPosition);
                 break;
         }
     }
@@ -250,22 +285,34 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     @Override
     public void onCompletion(MediaPlayer mp) {
 
-        mapPosition++;
-        if (urlList.size() > mapPosition) {
-            lunboFlag = true;
-            Log.d("lylog","onCompletion mapPosition ="+mapPosition);
-            playVideo(urlList.get(mapPosition).get("url"));
-        } else {
-            mapPosition = 0;
-            playVideo(urlList.get(mapPosition).get("url"));
-            mediaPlayer.pause();
-            bt_play.setVisibility(View.VISIBLE);
+        if (Utils.canPlay) {
+            ivProgressFlag++;
+            image_progress.setImageResource(ivProgresslist[ivProgressFlag]);//轮询视频进度，然而卵用的功能
+            if (ivProgressFlag == 4) {
+                ivProgressFlag = 0;
+                image_progress.setImageResource(ivProgresslist[ivProgressFlag]);
+            }
+
+            mapPosition++;
+            if (urlList.size() > mapPosition) {
+                lunboFlag = true;
+                Log.d("lylog", "onCompletion mapPosition =" + mapPosition);
+                playVideo(urlList.get(mapPosition).get("url"));
+            } else {
+                mapPosition = 0;
+                playVideo(urlList.get(mapPosition).get("url"));
+                mediaPlayer.pause();
+                bt_play.setVisibility(View.VISIBLE);
+            }
         }
 
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        gif_networkwait.setVisibility(View.INVISIBLE);
+        iv_error.setVisibility(View.INVISIBLE);
+        bt_play.setVisibility(View.VISIBLE);
         Log.d("lylog", " onPrepared");
         getVideoTime();
         resizeSurfaceView();
@@ -276,6 +323,12 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
+        Log.i("lylog", "onError = " + what + " extra = " + extra);
+        Utils.canPlay = false;
+        Message msg = new Message();
+        msg.what = what;
+        msg.arg1 = extra;
+        mHandler.sendMessage(msg);
         return false;
     }
 
@@ -285,38 +338,11 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         seekBar.setProgress(percent);
     }
 
-    @Override
-    public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-        // changeVideoSize();
-    }
-
-    public void changeVideoSize() {
-        int videoWidth = mediaPlayer.getVideoWidth();
-        int videoHeight = mediaPlayer.getVideoHeight();
-
-        //根据视频尺寸去计算->视频可以在sufaceView中放大的最大倍数。
-        float max;
-        if (getResources().getConfiguration().orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            //竖屏模式下按视频宽度计算放大倍数值
-            max = Math.max((float) videoWidth / (float) surfaceWidth, (float) videoHeight / (float) surfaceHeight);
-        } else {
-            //横屏模式下按视频高度计算放大倍数值
-            max = Math.max(((float) videoWidth / (float) surfaceHeight), (float) videoHeight / (float) surfaceWidth);
-        }
-
-        //视频宽高分别/最大倍数值 计算出放大后的视频尺寸
-        videoWidth = (int) Math.ceil((float) videoWidth / max);
-        videoHeight = (int) Math.ceil((float) videoHeight / max);
-
-        //无法直接设置视频尺寸，将计算出的视频尺寸设置到surfaceView 让视频自动填充。
-        mSurfaceView.setLayoutParams(new RelativeLayout.LayoutParams(videoWidth, videoHeight));
-    }
-
     private SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
 
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            Log.d("lylog"," progress111 = "+progress);
+            Log.d("lylog", " progress111 = " + progress);
 
             if (fromUser) {
 
@@ -329,14 +355,10 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         }
 
         @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
+        public void onStartTrackingTouch(SeekBar seekBar) { }
 
         @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
+        public void onStopTrackingTouch(SeekBar seekBar) { }
     };
 
     public void getVideoTime() {
@@ -371,4 +393,13 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         mediaPlayer.seekTo(currentPosition);
         super.onResume();
     }
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            iv_error.setVisibility(View.VISIBLE);
+            bt_play.setVisibility(View.INVISIBLE);
+            gif_networkwait.setVisibility(View.INVISIBLE);
+        }
+    };
 }

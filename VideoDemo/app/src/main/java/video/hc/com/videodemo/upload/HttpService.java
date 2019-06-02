@@ -19,7 +19,7 @@ import okhttp3.Response;
 
 public class HttpService {
 
-    public void getData(){
+    public void getURLData(){
         String url = "http://wwww.baidu.com";
         OkHttpClient okHttpClient = new OkHttpClient();
         final Request request = new Request.Builder()
