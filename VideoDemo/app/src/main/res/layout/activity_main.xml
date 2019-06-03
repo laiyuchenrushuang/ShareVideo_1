@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@mipmap/bg"
-              android:orientation="vertical"
-              tools:context="video.hc.com.videodemo.MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg"
+    android:orientation="vertical"
+    tools:context="video.hc.com.videodemo.MainActivity">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -25,7 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="44dp"
-                android:layout_marginTop="37dp"/>
+                android:layout_marginTop="37dp" />
         </FrameLayout>
 
 
@@ -42,7 +42,7 @@
                 android:id="@+id/video"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/surface_fragment"/>
+                android:background="@drawable/surface_fragment" />
 
             <ImageView
                 android:id="@+id/button_play"
@@ -50,8 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:background="@mipmap/play"
-                />
+                android:background="@mipmap/play" />
 
             <ImageView
                 android:id="@+id/button_pause"
@@ -60,7 +59,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:background="@mipmap/pause"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/iv_error"
@@ -75,18 +74,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:background="@mipmap/error"
-                    />
+                    android:background="@mipmap/error" />
 
                 <TextView
                     android:id="@+id/txt_error"
                     android:layout_width="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_gravity="center_horizontal"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/app_error"
                     android:textColor="@color/red"
-                    android:textSize="10sp"
-                    android:text="@string/app_error"/>
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <pl.droidsonroids.gif.GifImageView
@@ -96,8 +94,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:background="@mipmap/network_waitting"
-                android:visibility="gone"
-                />
+                android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/scan_progress"
@@ -109,27 +106,27 @@
 
                 <TextView
                     android:id="@+id/start_time"
+                    style="@style/timefrom"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.1"
-                    android:text="00:00"
                     android:gravity="end"
-                    style="@style/timefrom"/>
+                    android:text="00:00" />
 
                 <SeekBar
                     android:id="@+id/video_progress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.8"/>
+                    android:layout_weight="0.8" />
 
                 <TextView
                     android:id="@+id/video_time"
+                    style="@style/timefrom"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.1"
-                    android:text="00:00"
                     android:gravity="left"
-                    style="@style/timefrom" />
+                    android:text="00:00" />
             </LinearLayout>
         </RelativeLayout>
 
@@ -145,23 +142,37 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="15dp" />
 
-
-            <TextView
-                android:id="@+id/test"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                />
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:weightSum="1">
 
-            <ImageView
-                android:id="@+id/button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="55dp"
-                android:background="@mipmap/button"
-                />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5">
+
+                    <TextView
+                        android:id="@+id/test"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5">
+
+                    <ImageView
+                        android:id="@+id/button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_marginTop="29dp"
+                        android:background="@mipmap/button" />
+                </RelativeLayout>
+            </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>
