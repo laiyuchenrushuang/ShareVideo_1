@@ -16,6 +16,7 @@ import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewOutlineProvider;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,6 +32,7 @@ import butterknife.ButterKnife;
 import pl.droidsonroids.gif.GifImageView;
 import video.hc.com.videodemo.base.BeseActivity;
 import video.hc.com.videodemo.upload.HttpService;
+import video.hc.com.videodemo.utils.SurfaceViewOutlineProviderUtil;
 import video.hc.com.videodemo.utils.TimeUtils;
 import video.hc.com.videodemo.utils.Utils;
 
@@ -59,10 +61,10 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     @BindView(R.id.txt_error)
     TextView txt_error;
 
+    @BindView(R.id.scan_progress)
+    LinearLayout scan_progress;
     private static int currentPosition = 0;
     private SurfaceHolder surfaceHolder;
-    private String[] mPermissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
-    private int surfaceWidth, surfaceHeight;
     MediaPlayer mediaPlayer;
     ArrayList<Map<String, String>> urlList = new ArrayList();
     int[] ivProgresslist = {R.mipmap.progress1, R.mipmap.progress2, R.mipmap.progress3, R.mipmap.progress4, R.mipmap.progress5};
@@ -97,8 +99,6 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
                 Log.i("lylog", "SurfaceHolder 变化时");
-                surfaceWidth = width;
-                surfaceHeight = height;
                 mediaPlayer.setDisplay(surfaceHolder);
             }
 
@@ -112,6 +112,9 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
             }
         });
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        image_progress.setImageResource(ivProgresslist[ivProgressFlag]);
+        mSurfaceView.setOutlineProvider(new SurfaceViewOutlineProviderUtil(30));
+        mSurfaceView.setClipToOutline(true);
         initSeekBarColor();
     }
 
@@ -172,8 +175,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
             case R.id.video:
                 if (mediaPlayer.isPlaying()) {
                     bt_pause.setVisibility(View.VISIBLE);
-                    seekBar.setVisibility(View.VISIBLE);
-                    videoTime.setVisibility(View.VISIBLE);
+                    scan_progress.setVisibility(View.VISIBLE);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -183,8 +185,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                                     @Override
                                     public void run() {
                                         bt_pause.setVisibility(View.INVISIBLE);
-                                        seekBar.setVisibility(View.INVISIBLE);
-                                        videoTime.setVisibility(View.INVISIBLE);
+                                        scan_progress.setVisibility(View.INVISIBLE);
                                     }
                                 });
                             } catch (InterruptedException e) {
@@ -194,8 +195,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                     }).start();
                 } else if (Utils.canPlay){
                     bt_play.setVisibility(View.VISIBLE);
-                    seekBar.setVisibility(View.VISIBLE);
-                    videoTime.setVisibility(View.VISIBLE);
+                    scan_progress.setVisibility(View.VISIBLE);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -205,8 +205,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                                     @Override
                                     public void run() {
                                         bt_play.setVisibility(View.INVISIBLE);
-                                        seekBar.setVisibility(View.INVISIBLE);
-                                        videoTime.setVisibility(View.INVISIBLE);
+                                        scan_progress.setVisibility(View.INVISIBLE);
                                     }
                                 });
                             } catch (InterruptedException e) {
@@ -215,8 +214,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                         }
                     }).start();
                 }else {
-                    seekBar.setVisibility(View.VISIBLE);
-                    videoTime.setVisibility(View.VISIBLE);
+                    scan_progress.setVisibility(View.VISIBLE);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -225,8 +223,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        seekBar.setVisibility(View.INVISIBLE);
-                                        videoTime.setVisibility(View.INVISIBLE);
+                                        scan_progress.setVisibility(View.INVISIBLE);
                                     }
                                 });
                             } catch (InterruptedException e) {
@@ -262,8 +259,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
 
     private void playButtonClick() {
         bt_play.setVisibility(View.INVISIBLE);
-        seekBar.setVisibility(View.INVISIBLE);
-        videoTime.setVisibility(View.INVISIBLE);
+        scan_progress.setVisibility(View.INVISIBLE);
         play(currentPosition);
     }
 
@@ -289,8 +285,8 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
             ivProgressFlag++;
             image_progress.setImageResource(ivProgresslist[ivProgressFlag]);//轮询视频进度，然而卵用的功能
             if (ivProgressFlag == 4) {
-                ivProgressFlag = 0;
                 image_progress.setImageResource(ivProgresslist[ivProgressFlag]);
+                ivProgressFlag = -1;
             }
 
             mapPosition++;
@@ -301,7 +297,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
             } else {
                 mapPosition = 0;
                 playVideo(urlList.get(mapPosition).get("url"));
-                mediaPlayer.pause();
+//                mediaPlayer.pause();
                 bt_play.setVisibility(View.VISIBLE);
             }
         }
@@ -317,6 +313,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         getVideoTime();
         resizeSurfaceView();
         if (lunboFlag) {
+            bt_play.setVisibility(View.INVISIBLE);//轮播自动播放不需要播放按钮
             mp.start();
         }
     }
@@ -336,14 +333,15 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
         mPrecent = percent;
         seekBar.setProgress(percent);
+        int currentTime = mp.getCurrentPosition();
+        String time = TimeUtils.calculateTime(currentTime/1000);
+        startTime.setText(time);
     }
 
     private SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
 
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            Log.d("lylog", " progress111 = " + progress);
-
             if (fromUser) {
 
                 int duration2 = mediaPlayer.getDuration();
@@ -380,18 +378,18 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     @Override
     protected void onPause() {
         Log.d("lylog1", " onPause ");
-        mediaPlayer.stop();
         currentPosition = mediaPlayer.getCurrentPosition();
+        mediaPlayer.stop();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
+        super.onResume();
         bt_play.setVisibility(View.VISIBLE);
         Log.d("lylog1", " onResume mPrecent =" + mPrecent);
         seekBar.setProgress(mPrecent);
         mediaPlayer.seekTo(currentPosition);
-        super.onResume();
     }
     private Handler mHandler = new Handler(){
         @Override
