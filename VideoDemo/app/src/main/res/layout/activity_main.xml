@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@mipmap/bg"
     android:orientation="vertical"
+    android:adjustViewBounds = "true"
     tools:context="video.hc.com.videodemo.MainActivity">
 
     <LinearLayout
@@ -38,7 +39,7 @@
             android:paddingLeft="13dp"
             android:paddingTop="3dp">
 
-            <SurfaceView
+            <video.hc.com.videodemo.view.MySurfaceView
                 android:id="@+id/video"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -111,7 +112,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.1"
                     android:gravity="end"
-                    android:text="00:00" />
+                    android:text="00:00"
+                    android:visibility="invisible"/>
 
                 <SeekBar
                     android:id="@+id/video_progress"

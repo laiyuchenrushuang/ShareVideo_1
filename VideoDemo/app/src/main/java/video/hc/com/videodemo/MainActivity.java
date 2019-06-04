@@ -1,6 +1,7 @@
 package video.hc.com.videodemo;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -13,6 +14,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -35,10 +37,11 @@ import video.hc.com.videodemo.upload.HttpService;
 import video.hc.com.videodemo.utils.SurfaceViewOutlineProviderUtil;
 import video.hc.com.videodemo.utils.TimeUtils;
 import video.hc.com.videodemo.utils.Utils;
+import video.hc.com.videodemo.view.MySurfaceView;
 
-public class MainActivity extends BeseActivity implements View.OnClickListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener {
+public class MainActivity extends BeseActivity implements View.OnClickListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener, MySurfaceView.GestrueListener {
     @BindView(R.id.video)
-    SurfaceView mSurfaceView;
+    MySurfaceView mSurfaceView;
     @BindView(R.id.button_play)
     ImageView bt_play;
     @BindView(R.id.button_pause)
@@ -80,13 +83,12 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         ButterKnife.bind(this);
         urlList = HttpService.getUrlList();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
+        mSurfaceView.registerListener(this);
         initView();
         initEvent();
     }
 
     private void initView() {
-//        setDataIVProgress();
         mediaPlayer = new MediaPlayer();
         surfaceHolder = mSurfaceView.getHolder();
         surfaceHolder.addCallback(new SurfaceHolder.Callback() {
@@ -132,6 +134,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         button.setOnClickListener(this);
 
         mSurfaceView.setOnClickListener(this);
+
         seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
         iv_error.setOnClickListener(this);
         //mediaPlayer.setOnVideoSizeChangedListener(this);
@@ -171,67 +174,10 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         switch (v.getId()) {
             case R.id.button_play:
                 playButtonClick();
+                Utils.canPlay = true;
                 break;
             case R.id.video:
-                if (mediaPlayer.isPlaying()) {
-                    bt_pause.setVisibility(View.VISIBLE);
-                    scan_progress.setVisibility(View.VISIBLE);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Thread.sleep(2000);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        bt_pause.setVisibility(View.INVISIBLE);
-                                        scan_progress.setVisibility(View.INVISIBLE);
-                                    }
-                                });
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
-                } else if (Utils.canPlay){
-                    bt_play.setVisibility(View.VISIBLE);
-                    scan_progress.setVisibility(View.VISIBLE);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Thread.sleep(2000);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        bt_play.setVisibility(View.INVISIBLE);
-                                        scan_progress.setVisibility(View.INVISIBLE);
-                                    }
-                                });
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
-                }else {
-                    scan_progress.setVisibility(View.VISIBLE);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Thread.sleep(2000);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        scan_progress.setVisibility(View.INVISIBLE);
-                                    }
-                                });
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
-                }
+                //doshowProgressState();
                 break;
             case R.id.button_pause:
                 bt_pause.setVisibility(View.INVISIBLE);
@@ -241,11 +187,13 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                 break;
             case R.id.button:
                 mediaPlayer.stop();
+                lunboFlag = false;
                 loadThirdWeb();
                 break;
             case R.id.iv_error:
                 playVideo(urlList.get(mapPosition).get("url"));
                 mediaPlayer.seekTo(currentPosition);
+                Utils.canPlay = true;
                 break;
         }
     }
@@ -297,8 +245,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
             } else {
                 mapPosition = 0;
                 playVideo(urlList.get(mapPosition).get("url"));
-//                mediaPlayer.pause();
-                bt_play.setVisibility(View.VISIBLE);
+//                bt_play.setVisibility(View.VISIBLE);
             }
         }
 
@@ -308,14 +255,15 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     public void onPrepared(MediaPlayer mp) {
         gif_networkwait.setVisibility(View.INVISIBLE);
         iv_error.setVisibility(View.INVISIBLE);
-        bt_play.setVisibility(View.VISIBLE);
+        scan_progress.setVisibility(View.INVISIBLE);//++
+        //bt_play.setVisibility(View.VISIBLE);
         Log.d("lylog", " onPrepared");
         getVideoTime();
         resizeSurfaceView();
-        if (lunboFlag) {
-            bt_play.setVisibility(View.INVISIBLE);//轮播自动播放不需要播放按钮
-            mp.start();
-        }
+//        if (lunboFlag) {
+//            bt_play.setVisibility(View.INVISIBLE);//轮播自动播放不需要播放按钮
+        mp.start();
+//        }
     }
 
     @Override
@@ -323,7 +271,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         Log.i("lylog", "onError = " + what + " extra = " + extra);
         Utils.canPlay = false;
         Message msg = new Message();
-        msg.what = what;
+        msg.what = Utils.VIDEO_ERROR;
         msg.arg1 = extra;
         mHandler.sendMessage(msg);
         return false;
@@ -334,8 +282,8 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         mPrecent = percent;
         seekBar.setProgress(percent);
         int currentTime = mp.getCurrentPosition();
-        String time = TimeUtils.calculateTime(currentTime/1000);
-        startTime.setText(time);
+        String time = TimeUtils.calculateTime(currentTime / 1000);
+//        startTime.setText(time);
     }
 
     private SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
@@ -353,10 +301,12 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         }
 
         @Override
-        public void onStartTrackingTouch(SeekBar seekBar) { }
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
 
         @Override
-        public void onStopTrackingTouch(SeekBar seekBar) { }
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
     };
 
     public void getVideoTime() {
@@ -391,13 +341,135 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         seekBar.setProgress(mPrecent);
         mediaPlayer.seekTo(currentPosition);
     }
-    private Handler mHandler = new Handler(){
+
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            iv_error.setVisibility(View.VISIBLE);
-            bt_play.setVisibility(View.INVISIBLE);
-            gif_networkwait.setVisibility(View.INVISIBLE);
+            switch (msg.what) {
+                case Utils.VIDEO_ERROR:
+                    iv_error.setVisibility(View.VISIBLE);
+                    bt_play.setVisibility(View.INVISIBLE);
+                    gif_networkwait.setVisibility(View.INVISIBLE);
+                    break;
+                case Utils.VIDEO_PRE:
+                    Log.d("lylogsss", " VIDEO_PRE");
+                    if (currentPosition > 0) {
+                        currentPosition--;
+                    } else {
+                        currentPosition = 0;
+                    }
+                    playVideo(urlList.get(currentPosition).get("url"));
+                    if (ivProgressFlag > 0) {
+                        ivProgressFlag--;
+                    } else {
+                        ivProgressFlag = 0;
+                    }
+                    image_progress.setImageResource(ivProgresslist[ivProgressFlag]);
+                    break;
+                case Utils.VIDEO_NEXT:
+                    Log.d("lylogsss", " VIDEO_NEXT");
+                    if (currentPosition < urlList.size() - 1) {
+                        currentPosition++;
+                    } else {
+                        currentPosition = urlList.size() - 1;
+                    }
+                    playVideo(urlList.get(currentPosition).get("url"));
+
+                    if (ivProgressFlag == 4) {
+                        ivProgressFlag = 0;
+                    } else {
+                        ivProgressFlag++;
+                    }
+                    image_progress.setImageResource(ivProgresslist[ivProgressFlag]);
+                    break;
+                case Utils.VIDEO_ONCLICK:
+                    Log.d("lylogsss", " VIDEO_ONCLICK");
+                    doshowProgressState();
+                    break;
+            }
+
         }
     };
+
+    private void doshowProgressState() {
+        Log.d("lylogsss", " VIDEO_ONCLICK");
+        if (mediaPlayer.isPlaying()) {
+            bt_pause.setVisibility(View.VISIBLE);
+            scan_progress.setVisibility(View.VISIBLE);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(2000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                bt_pause.setVisibility(View.INVISIBLE);
+                                scan_progress.setVisibility(View.INVISIBLE);
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } else if (Utils.canPlay) {
+            bt_play.setVisibility(View.VISIBLE);
+            scan_progress.setVisibility(View.VISIBLE);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(2000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                bt_play.setVisibility(View.INVISIBLE);
+                                scan_progress.setVisibility(View.INVISIBLE);
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } else {
+            scan_progress.setVisibility(View.VISIBLE);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(2000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                scan_progress.setVisibility(View.INVISIBLE);
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+    }
+
+    @Override
+    public void gestrueDerection(int firstX, int endX) {
+        if (Math.abs((firstX - endX)) > Utils.SLIDE_SCALE && firstX < endX) {
+            Message msg = new Message();
+            msg.what = Utils.VIDEO_PRE;
+            mHandler.sendMessage(msg);
+        } else if (Math.abs((firstX - endX)) > Utils.SLIDE_SCALE && firstX > endX) {
+            Message msg = new Message();
+            msg.what = Utils.VIDEO_NEXT;
+            mHandler.sendMessage(msg);
+        } else if (Utils.ONCLICK_SCALE_MIN < Math.abs((firstX - endX)) && Math.abs((firstX - endX)) < Utils.ONCLICK_SCALE_MAX) {
+            Message msg = new Message();
+            msg.what = Utils.VIDEO_ONCLICK;
+            mHandler.sendMessage(msg);
+        }
+    }
 }
