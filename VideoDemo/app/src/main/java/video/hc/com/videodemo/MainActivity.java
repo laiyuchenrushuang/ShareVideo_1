@@ -173,8 +173,8 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_play:
-                playButtonClick();
                 Utils.canPlay = true;
+                playButtonClick();
                 break;
             case R.id.video:
                 //doshowProgressState();
@@ -193,7 +193,6 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
             case R.id.iv_error:
                 playVideo(urlList.get(mapPosition).get("url"));
                 mediaPlayer.seekTo(currentPosition);
-                Utils.canPlay = true;
                 break;
         }
     }
@@ -229,6 +228,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     @Override
     public void onCompletion(MediaPlayer mp) {
 
+        Log.d("lylog11", "onCompletion canPlay =" + Utils.canPlay);
         if (Utils.canPlay) {
             ivProgressFlag++;
             image_progress.setImageResource(ivProgresslist[ivProgressFlag]);//轮询视频进度，然而卵用的功能
@@ -236,7 +236,6 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                 image_progress.setImageResource(ivProgresslist[ivProgressFlag]);
                 ivProgressFlag = -1;
             }
-
             mapPosition++;
             if (urlList.size() > mapPosition) {
                 lunboFlag = true;
@@ -253,6 +252,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        Utils.canPlay = true;
         gif_networkwait.setVisibility(View.INVISIBLE);
         iv_error.setVisibility(View.INVISIBLE);
         scan_progress.setVisibility(View.INVISIBLE);//++
@@ -264,11 +264,12 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
 //            bt_play.setVisibility(View.INVISIBLE);//轮播自动播放不需要播放按钮
         mp.start();
 //        }
+        Log.d("lylog11", "onPrepared canPlay =" + Utils.canPlay);
     }
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
-        Log.i("lylog", "onError = " + what + " extra = " + extra);
+        Log.i("lylog11", "onError = " + what + " extra = " + extra);
         Utils.canPlay = false;
         Message msg = new Message();
         msg.what = Utils.VIDEO_ERROR;
