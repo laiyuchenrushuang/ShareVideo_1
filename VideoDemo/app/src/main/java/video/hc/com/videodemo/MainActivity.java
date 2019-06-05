@@ -228,8 +228,12 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     @Override
     public void onCompletion(MediaPlayer mp) {
 
-        Log.d("lylog11", "onCompletion canPlay =" + Utils.canPlay);
         if (Utils.canPlay) {
+             //播完一集，下一集从0开始
+            if(!mp.isPlaying()){
+                currentPosition = 0;
+            }
+       
             ivProgressFlag++;
             image_progress.setImageResource(ivProgresslist[ivProgressFlag]);//轮询视频进度，然而卵用的功能
             if (ivProgressFlag == 4) {
@@ -262,8 +266,9 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         resizeSurfaceView();
 //        if (lunboFlag) {
 //            bt_play.setVisibility(View.INVISIBLE);//轮播自动播放不需要播放按钮
-        mp.start();
+//        mp.start();
 //        }
+        play(currentPosition);
         Log.d("lylog11", "onPrepared canPlay =" + Utils.canPlay);
     }
 
@@ -386,7 +391,6 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                     image_progress.setImageResource(ivProgresslist[ivProgressFlag]);
                     break;
                 case Utils.VIDEO_ONCLICK:
-                    Log.d("lylogsss", " VIDEO_ONCLICK");
                     doshowProgressState();
                     break;
             }
