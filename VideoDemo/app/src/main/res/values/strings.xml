@@ -4,4 +4,7 @@
     <string name="app_video_share">立即体验</string>
     <string name="app_comfrom">技术支持 @ 成都海成科技有限公司</string>
     <string name="app_error">网络连接失败或者网络地址有错</string>
+    <string name="bt_study">视频学习</string>
+    <string name="bt_document">学习资料</string>
+    <string name="bt_info">蓉e行介绍</string>
 </resources>

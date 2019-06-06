@@ -199,7 +199,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
 
     private void loadThirdWeb() {
         Intent intent = new Intent();
-        intent.setClass(this, ToolActivity.class);
+        intent.setClass(this, NewActivity.class);
         intent.putExtra("url", "http://www.baidu.com");
         startActivity(intent);
     }

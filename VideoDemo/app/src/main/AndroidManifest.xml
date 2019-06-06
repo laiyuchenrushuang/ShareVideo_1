@@ -20,6 +20,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ToolActivity"
+        android:screenOrientation="portrait">
+    </activity>
+        <activity android:name=".NewActivity"
             android:screenOrientation="portrait">
         </activity>
     </application>
