@@ -1,6 +1,5 @@
 package video.hc.com.videodemo;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
@@ -14,11 +13,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Display;
-import android.view.KeyEvent;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewOutlineProvider;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -200,7 +196,7 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     private void loadThirdWeb() {
         Intent intent = new Intent();
         intent.setClass(this, NewActivity.class);
-        intent.putExtra("url", "http://www.baidu.com");
+        intent.putExtra("url", "http://jtzzlm.cdjg.chengdu.gov.cn/cdjj/newcwtapi/newindex?id=888&code=oSthY1d1ccDM1JPaQrLDsihxLbZ&state=STATE");
         startActivity(intent);
     }
 

@@ -3,9 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/VideoDemo.iml" filepath="$PROJECT_DIR$/VideoDemo.iml" />
-      <module fileurl="file://D:\lyzy\Code\githubCode\111\ShareVideo_1\VideoDemo\VideoDemo.iml" filepath="D:\lyzy\Code\githubCode\111\ShareVideo_1\VideoDemo\VideoDemo.iml" />
+      <module fileurl="file://D:/lyzy/Code/githubCode/111/ShareVideo_1/VideoDemo/VideoDemo.iml" filepath="D:/lyzy/Code/githubCode/111/ShareVideo_1/VideoDemo/VideoDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://D:\lyzy\Code\githubCode\111\ShareVideo_1\VideoDemo\app\app.iml" filepath="D:\lyzy\Code\githubCode\111\ShareVideo_1\VideoDemo\app\app.iml" />
+      <module fileurl="file://D:/lyzy/Code/githubCode/111/ShareVideo_1/VideoDemo/app/app.iml" filepath="D:/lyzy/Code/githubCode/111/ShareVideo_1/VideoDemo/app/app.iml" />
     </modules>
   </component>
 </project>
