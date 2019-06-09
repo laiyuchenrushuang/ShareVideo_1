@@ -11,9 +11,9 @@ import video.hc.com.videodemo.base.BaseFragment;
 
 public class MyPagerAdapter extends FragmentPagerAdapter{
     private FragmentManager fragmetnmanager;  //创建FragmentManager
-    private List<BaseFragment> listfragment; //创建一个List<Fragment>
+    private List<Fragment> listfragment; //创建一个List<Fragment>
 
-    public MyPagerAdapter(FragmentManager fm, ArrayList<BaseFragment> listf) {
+    public MyPagerAdapter(FragmentManager fm, ArrayList<Fragment> listf) {
         super(fm);
         this.fragmetnmanager=fm;
         this.listfragment=listf;

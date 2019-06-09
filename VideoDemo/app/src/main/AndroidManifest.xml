@@ -23,6 +23,7 @@
         android:screenOrientation="portrait">
     </activity>
         <activity android:name=".NewActivity"
+            android:screenOrientation="portrait"
             >
         </activity>
     </application>

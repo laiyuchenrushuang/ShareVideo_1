@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:adjustViewBounds="true"
     android:background="@mipmap/bg"
     android:orientation="vertical"
-    android:adjustViewBounds = "true"
     tools:context="video.hc.com.videodemo.MainActivity">
 
     <LinearLayout
@@ -113,7 +113,7 @@
                     android:layout_weight="0.1"
                     android:gravity="end"
                     android:text="00:00"
-                    android:visibility="invisible"/>
+                    android:visibility="invisible" />
 
                 <SeekBar
                     android:id="@+id/video_progress"
@@ -132,49 +132,77 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <RelativeLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.45">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="30dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="35dp"
+                android:background="@mipmap/bg_content" />
 
             <ImageView
                 android:id="@+id/image_progress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="15dp" />
+                android:layout_marginTop="15dp"
+                android:visibility="gone" />
 
             <LinearLayout
+                android:id="@+id/ll"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:weightSum="1">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/iv_publicity"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.5">
+                    android:background="@mipmap/bt_clicked"
+                    android:gravity="center"
+                    style="@style/title1"
+                    android:text="@string/publicity" />
 
-                    <TextView
-                        android:id="@+id/test"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/iv_experience"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.5">
-
-                    <ImageView
-                        android:id="@+id/button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_marginTop="29dp"
-                        android:background="@mipmap/button" />
-                </RelativeLayout>
+                    android:background="@mipmap/bt_click"
+                    android:gravity="center"
+                    style="@style/title1"
+                    android:text="@string/experience" />
             </LinearLayout>
-        </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="29dp"
+                android:background="@mipmap/button"
+                android:visibility="gone" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewpager"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="45dp"
+                android:background="@mipmap/bg_content"
+                android:backgroundTint="@android:color/transparent">
+
+            </android.support.v4.view.ViewPager>
+
+        </FrameLayout>
     </LinearLayout>
 </LinearLayout>

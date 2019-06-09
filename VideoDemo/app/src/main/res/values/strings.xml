@@ -7,4 +7,7 @@
     <string name="bt_study">视频学习</string>
     <string name="bt_document">学习资料</string>
     <string name="bt_info">蓉e行介绍</string>
+    <string name="publicity">交通安全宣传</string>
+    <string name="experience">“蓉e行”体验</string>
+    <string name="tv_content">\t\t“蓉e行”是一款最新的交通应用工具，蓉e行平台为大家带来最新的地区交通查询服务，无论是查违章，还是在线了解交通资讯，办理登记等业务，都需要通过手机端直接在线进行办理哟，当前平台用户众多，随时可用。</string>
 </resources>

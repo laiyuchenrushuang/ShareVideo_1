@@ -2,6 +2,7 @@ package video.hc.com.videodemo.utils;
 
 public class Utils {
 
+
     public static boolean canPlay = true;
     public final static int SLIDE_SCALE = 219;//手感比较好的位置
 
@@ -12,5 +13,10 @@ public class Utils {
     public final static int VIDEO_PRE = 0x0002;
     public final static int VIDEO_NEXT = 0x0003;
     public final static int VIDEO_ONCLICK = 0x0004;
+    public static final int FRAGMENT_CALLBACK = 0x0005;
+
+    public class NetWorkUtil {
+        public final static String BASE_URL = "http://192.168.0.53:8085/jyptdbctl/video/getVideoPage?";
+    }
 
 }

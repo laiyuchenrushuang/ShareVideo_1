@@ -1,6 +1,13 @@
 package video.hc.com.videodemo.upload;
 
 import android.media.MediaPlayer;
+import android.util.Log;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,56 +19,127 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import video.hc.com.videodemo.enity.VideoBean;
+import video.hc.com.videodemo.utils.JsonUtils;
+import video.hc.com.videodemo.utils.Utils;
 
 /**
  * Created by ly on 2019/5/30.
  */
 
 public class HttpService {
+    private static HttpService mHttpService;
 
-    public void getURLData(){
-        String url = "http://wwww.baidu.com";
+    public interface HttpServiceResult {
+        void success(Response result);
+        void failed(String result);
+    }
+
+    public interface HttpServiceLX {
+        void isOK(Response result);
+        void isNO(String result);
+    }
+
+    private ArrayList<Map<String, String>> hashMaps = new ArrayList<>();
+    private ArrayList<Map<String, String>> datalist = new ArrayList<>();
+
+    public static HttpService getInstance() {
+        if (mHttpService == null) {
+            synchronized (HttpService.class) {
+                if (mHttpService == null) {
+                    mHttpService = new HttpService();
+                }
+            }
+        }
+        return mHttpService;
+    }
+
+    public void getURLData(Map map, final HttpService.HttpServiceResult callback) {
+//        map.put("type", "1");
+//        map.put("curPage", "1");
+        map.put("pageSize", "4");
+        //http://192.168.0.53:8085/jyptdbctl/video/getVideoPage?type=1&curPage=1&pageSize=4
+        Log.d("lylog", "getURLData type = " + map.get("type") + " curPage" + map.get("curPage"));
+        String url = Utils.NetWorkUtil.BASE_URL + "type=" + map.get("type") + "&" + "curPage=" + map.get("curPage") + "&" + "pageSize=" + map.get("pageSize");
+
         OkHttpClient okHttpClient = new OkHttpClient();
         final Request request = new Request.Builder()
                 .url(url)
-                .get()//默认就是GET请求，可以不写
                 .build();
-
 
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                Log.d("lylogNet", " response error1");
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-
+                if (response.isSuccessful()) {
+                    callback.success(response);
+//                    String result = response.body().string();
+//
+//                    JsonParser parser = new JsonParser();  //创建JSON解析器
+//                    JsonObject object = (JsonObject) parser.parse(result);
+//                    JsonObject data = (JsonObject) object.get("data");
+//                    JsonArray listarray = data.getAsJsonArray("list");
+//                    Log.d("lylog", " listarray = " + listarray.size());
+//                    for (int i = 0; i < listarray.size(); i++) {
+//                        Map<String, String> map = new HashMap<>();
+//                        JsonObject subObject = listarray.get(i).getAsJsonObject();
+//                        map.put("url", subObject.get("url").getAsString());
+//                        map.put("theme", subObject.get("theme").getAsString());
+//                        datalist.add(map);
+//                    }
+//
+                } else {
+                    callback.failed(response.body().string());
+                    Log.d("lylogNet", " response error2");
+                }
             }
-        });//得到Response 对象
-
+        });
     }
 
-    public void getVideoResourceNetWork(MediaPlayer mediaPlayer,String url){
-        url = "http://bjcdn2.vod.migucloud.com/mgc_transfiles/200010145/2019/5/19/2EFBSUWNbMUSHXxvBeSQz/cld640p/video_2EFBSUWNbMUSHXxvBeSQz_cld640p.m3u8";
-        try {
-            mediaPlayer.setDataSource(url);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public static ArrayList<Map<String,String>> getUrlList() {
-        ArrayList<Map<String,String>> urlList = new ArrayList();
-        Map<String,String> map = new HashMap<>();
-        map.put("id","0");
-        map.put("url","http://bjcdn2.vod.migucloud.com/mgc_transfiles/200010145/2019/5/19/2EFBSUWNbMUSHXxvBeSQz/cld640p/video_2EFBSUWNbMUSHXxvBeSQz_cld640p.m3u8");
-        Map<String,String> map1 = new HashMap<>();
-        map1.put("id","1");
-        map1.put("url","http://bjcdn2.vod.migucloud.com/mgc_transfiles/200010145/2019/5/19/1EYo9UNOF95HCK30a3mHY/cld640p/video_1EYo9UNOF95HCK30a3mHY_cld640p.m3u8");
+    public static ArrayList<Map<String, String>> getUrlList() {
+        ArrayList<Map<String, String>> urlList = new ArrayList();
+        Map<String, String> map = new HashMap<>();
+        map.put("id", "0");
+        map.put("url", "http://bjcdn2.vod.migucloud.com/mgc_transfiles/200010145/2019/5/19/2EFBSUWNbMUSHXxvBeSQz/cld640p/video_2EFBSUWNbMUSHXxvBeSQz_cld640p.m3u8");
+//        map.put("url","http://mirror.aarnet.edu.au/pub/TED-talks/911Mothers_2010W-480p.mp4");
+        Map<String, String> map1 = new HashMap<>();
+        map1.put("id", "1");
+        map1.put("url", "http://bjcdn2.vod.migucloud.com/mgc_transfiles/200010145/2019/5/19/1EYo9UNOF95HCK30a3mHY/cld640p/video_1EYo9UNOF95HCK30a3mHY_cld640p.m3u8");
         urlList.add(map);
         urlList.add(map1);
         return urlList;
+    }
+
+    public ArrayList<Map<String, String>> getLXdata(final HttpService.HttpServiceLX callback) {
+        String url = "http://192.168.0.53:8089/electricPaymentInterface/admin/code/selectCodeByDMLB?xtlb=50&dmlb=0011";
+        OkHttpClient okHttpClient = new OkHttpClient();
+        final Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("lylogNet", " getLXdata response error1");
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    callback.isOK(response);
+                    Log.d("lylogss", " onResponse");
+
+                } else {
+                    callback.isNO(response.body().string());
+                    Log.d("lylogNet", " getLXdata response error2");
+                }
+
+            }
+        });//得到Response 对象
+        return hashMaps;
     }
 }

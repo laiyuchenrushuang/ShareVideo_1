@@ -2,6 +2,7 @@ package video.hc.com.videodemo;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.View;
@@ -51,7 +52,7 @@ public class NewActivity extends BeseActivity implements View.OnClickListener {
 
     private void initView() {
         FragmentManager fm=getSupportFragmentManager();
-        ArrayList<BaseFragment> listf = new ArrayList<>();
+        ArrayList<Fragment> listf = new ArrayList<>();
         Fragment1 f1 = new Fragment1();
         Fragment2 f2 = new Fragment2();
         Fragment3 f3 = new Fragment3();

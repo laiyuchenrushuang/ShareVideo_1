@@ -1,12 +1,18 @@
 package video.hc.com.videodemo.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 
+import butterknife.BindView;
+import video.hc.com.videodemo.NewActivity;
 import video.hc.com.videodemo.R;
+import video.hc.com.videodemo.ToolActivity;
 import video.hc.com.videodemo.base.BaseFragment;
 
 /**
@@ -14,6 +20,8 @@ import video.hc.com.videodemo.base.BaseFragment;
  */
 
 public class Fragment3 extends BaseFragment {
+    @BindView(R.id.bt_url)
+    ImageView bt_url;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,11 +38,23 @@ public class Fragment3 extends BaseFragment {
 
     @Override
     public View getLayoutView(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.fragment3,null);
+        return inflater.inflate(R.layout.fragment3, null);
     }
 
     @Override
     public void initView() {
+        bt_url.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadThirdWeb();
+            }
+        });
+    }
 
+    private void loadThirdWeb() {
+        Intent intent = new Intent();
+        intent.setClass(getContext(), ToolActivity.class);
+        intent.putExtra("url", "http://jtzzlm.cdjg.chengdu.gov.cn/cdjj/newcwtapi/newindex?id=888&code=oSthY1d1ccDM1JPaQrLDsihxLbZ&state=STATE");
+        startActivity(intent);
     }
 }

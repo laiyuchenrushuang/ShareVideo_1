@@ -11,31 +11,42 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.droidsonroids.gif.GifImageView;
+import video.hc.com.videodemo.adapter.MyPagerAdapter;
+import video.hc.com.videodemo.base.BaseFragment;
 import video.hc.com.videodemo.base.BeseActivity;
+import video.hc.com.videodemo.fragment.Fragment1;
+import video.hc.com.videodemo.fragment.Fragment2;
+import video.hc.com.videodemo.fragment.Fragment3;
 import video.hc.com.videodemo.upload.HttpService;
 import video.hc.com.videodemo.utils.SurfaceViewOutlineProviderUtil;
 import video.hc.com.videodemo.utils.TimeUtils;
 import video.hc.com.videodemo.utils.Utils;
 import video.hc.com.videodemo.view.MySurfaceView;
 
-public class MainActivity extends BeseActivity implements View.OnClickListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener, MySurfaceView.GestrueListener {
+public class MainActivity extends BeseActivity implements Fragment1.FragmentCallback,View.OnClickListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener, MySurfaceView.GestrueListener {
     @BindView(R.id.video)
     MySurfaceView mSurfaceView;
     @BindView(R.id.button_play)
@@ -60,8 +71,16 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     @BindView(R.id.txt_error)
     TextView txt_error;
 
+    @BindView(R.id.iv_publicity)
+    TextView iv_publicity;
+    @BindView(R.id.iv_experience)
+    TextView iv_experience;
+
+    @BindView(R.id.viewpager)
+    ViewPager vp_video;
     @BindView(R.id.scan_progress)
     LinearLayout scan_progress;
+
     private static int currentPosition = 0;
     private SurfaceHolder surfaceHolder;
     MediaPlayer mediaPlayer;
@@ -71,6 +90,8 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     private static int mPrecent = 0;
     private static boolean lunboFlag = false;
     private static int mapPosition = 0;
+    private MyPagerAdapter vpAdapter;
+    public static ArrayList<Map<String, String>> listdata;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +101,14 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         urlList = HttpService.getUrlList();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mSurfaceView.registerListener(this);
+        initFragmentData();
+
         initView();
         initEvent();
+    }
+
+    private void initFragmentData() {
+
     }
 
     private void initView() {
@@ -114,6 +141,15 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
         mSurfaceView.setOutlineProvider(new SurfaceViewOutlineProviderUtil(30));
         mSurfaceView.setClipToOutline(true);
         initSeekBarColor();
+        FragmentManager fm = getSupportFragmentManager();
+        ArrayList<Fragment> listf = new ArrayList<>();
+        Fragment1 f1 = new Fragment1();
+        Fragment3 f3 = new Fragment3();
+        listf.add(f1);
+        listf.add(f3);
+
+        vpAdapter = new MyPagerAdapter(fm, listf);
+        vp_video.setAdapter(vpAdapter);
     }
 
     private void initSeekBarColor() {
@@ -133,6 +169,27 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
 
         seekBar.setOnSeekBarChangeListener(seekBarChangeListener);
         iv_error.setOnClickListener(this);
+        iv_publicity.setOnClickListener(this);
+        iv_experience.setOnClickListener(this);
+
+        vp_video.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 0) {
+                    showbuttonBgPublicity();
+                } else if (position == 1) {
+                    showbuttonBgExperience();
+                }
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         //mediaPlayer.setOnVideoSizeChangedListener(this);
     }
 
@@ -190,7 +247,26 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                 playVideo(urlList.get(mapPosition).get("url"));
                 mediaPlayer.seekTo(currentPosition);
                 break;
+            case R.id.iv_experience:
+                showbuttonBgExperience();
+
+                vp_video.setCurrentItem(1);
+                break;
+            case R.id.iv_publicity:
+                showbuttonBgPublicity();
+                vp_video.setCurrentItem(0);
+                break;
         }
+    }
+
+    private void showbuttonBgPublicity() {
+        iv_publicity.setBackground(getResources().getDrawable(R.mipmap.bt_clicked));
+        iv_experience.setBackground(getResources().getDrawable(R.mipmap.bt_click));
+    }
+
+    private void showbuttonBgExperience() {
+        iv_experience.setBackground(getResources().getDrawable(R.mipmap.bt_clicked));
+        iv_publicity.setBackground(getResources().getDrawable(R.mipmap.bt_click));
     }
 
     private void loadThirdWeb() {
@@ -225,11 +301,11 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
     public void onCompletion(MediaPlayer mp) {
 
         if (Utils.canPlay) {
-             //播完一集，下一集从0开始
-            if(!mp.isPlaying()){
+            //播完一集，下一集从0开始
+            if (!mp.isPlaying()) {
                 currentPosition = 0;
             }
-       
+
             ivProgressFlag++;
             image_progress.setImageResource(ivProgresslist[ivProgressFlag]);//轮询视频进度，然而卵用的功能
             if (ivProgressFlag == 4) {
@@ -389,6 +465,10 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
                 case Utils.VIDEO_ONCLICK:
                     doshowProgressState();
                     break;
+                case Utils.FRAGMENT_CALLBACK:
+                    String url = (String) msg.obj;
+                    playVideo(url);
+                    break;
             }
 
         }
@@ -472,5 +552,13 @@ public class MainActivity extends BeseActivity implements View.OnClickListener, 
             msg.what = Utils.VIDEO_ONCLICK;
             mHandler.sendMessage(msg);
         }
+    }
+
+    @Override
+    public void urlCallback(String url) {
+        Message msg = new Message();
+        msg.obj= url;
+        msg.what = Utils.FRAGMENT_CALLBACK;
+        mHandler.sendMessage(msg);
     }
 }

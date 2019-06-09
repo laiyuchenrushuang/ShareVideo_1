@@ -1,32 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="179dp"
-        android:scrollbars="none">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="3dp"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
 
-        <RadioGroup
-            android:id="@+id/rb_video_lx"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-        </RadioGroup>
-    </ScrollView>
+            android:layout_gravity="center_horizontal"
+            android:background="@mipmap/up" />
+
+        <ScrollView
+            android:id="@+id/sv_leixing"
+            android:layout_width="wrap_content"
+            android:layout_height="179dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:scrollbars="none">
+
+            <RadioGroup
+                android:id="@+id/rb_video_lx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"></RadioGroup>
+
+        </ScrollView>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@mipmap/down" />
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="179dp"
-        >
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="20dp">
 
         <GridView
             android:id="@+id/gv_video"
             android:layout_width="match_parent"
-            android:layout_height="130dp"
+            android:layout_height="160dp"
             android:horizontalSpacing="15dp"
             android:numColumns="2"
             android:scrollbars="none">
@@ -36,8 +60,9 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:layout_below="@+id/gv_video"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="2dp"
             android:orientation="horizontal">
 
             <Button
@@ -45,20 +70,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:text="上一页"/>
+                style="@style/next_pager"
+                android:text="上一页" />
 
             <TextView
                 android:id="@+id/tv_page_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1/4"/>
+                style="@style/next_pager"
+                android:text="1/4" />
 
             <Button
                 android:id="@+id/bt_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:text="下一页"/>
+                style="@style/next_pager"
+                android:text="下一页" />
         </LinearLayout>
     </RelativeLayout>
 </LinearLayout>
