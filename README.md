@@ -13,7 +13,9 @@
 
 # 5.surfaceview的适配圆角，按钮适配显示位置，尽量用比例
 
-# 6.具体 git log看更新点
+# 6.Gridview Radiobutton Viewpager RadioGroup 的使用
+
+# 7.具体 git log看更新点
 
 -------------------------------------------------------
 
