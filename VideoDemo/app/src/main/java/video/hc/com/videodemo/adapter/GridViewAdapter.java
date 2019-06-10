@@ -1,6 +1,10 @@
 package video.hc.com.videodemo.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import video.hc.com.videodemo.R;
@@ -19,6 +24,7 @@ public class GridViewAdapter extends BaseAdapter {
     ArrayList<Map<String, String>> listmap;
 
     private LayoutInflater layoutInflater;
+
     public GridViewAdapter(Context context, ArrayList<Map<String, String>> listdata) {
         this.context = context;
         this.listmap = listdata;
@@ -41,7 +47,7 @@ public class GridViewAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHolder holder = null;
         if (convertView == null) {
@@ -53,23 +59,45 @@ public class GridViewAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        final Map<String,String> map = listmap.get(position);
+
+        Map<String, String> map = listmap.get(position);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.bg_waiting);
         if (map != null) {
-            holder.textView.setText(map.get("theme")+"");
-            holder.imageView.setBackgroundResource(R.mipmap.bg_waiting);
+            holder.textView.setText(map.get("theme") + "");
+            holder.imageView.setImageBitmap(bitmap);
+        }else {
+            holder.textView.setText("null");
+            holder.imageView.setImageBitmap(bitmap);
         }
-//        convertView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d("lylog"," click convertView +"+position);
-//                String url = listmap.get(position).get("url");
-//            }
-//        });
+
+        Log.d("lylog", " sssssss");
+
+
+//      new Thread(new ImageTask(map)).start();
+
         return convertView;
     }
 
     private class ViewHolder {
         ImageView imageView;
         TextView textView;
+    }
+
+    private class ImageTask implements Runnable {
+        Map<String, String> map;
+
+        public ImageTask(Map<String, String> map) {
+            this.map = map;
+        }
+
+        @Override
+        public void run() {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever(); //获取网络视频
+            String url = map.get("url");
+            Log.d("lylog", " url11 = " + url);
+            retriever.setDataSource(url, new HashMap<String, String>());
+
+        }
     }
 }

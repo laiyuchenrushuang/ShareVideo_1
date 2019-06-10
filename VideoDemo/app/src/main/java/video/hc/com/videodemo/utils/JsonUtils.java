@@ -42,6 +42,8 @@ public class JsonUtils {
             JsonObject subObject = listarray.get(i).getAsJsonObject();
             map.put("url", subObject.get("url").getAsString());
             map.put("theme", subObject.get("theme").getAsString());
+            map.put("count",data.get("count").getAsString());
+            map.put("pageNo",data.get("pageNo").getAsString());
             maplist.add(map);
         }
         return maplist;
@@ -54,7 +56,7 @@ public class JsonUtils {
         for (int i = 0; i < array.size(); i++) {
             Map<String, String> map = new HashMap<>();
             JsonObject subObject = array.get(i).getAsJsonObject();
-            map.put("type", subObject.get("mldh").getAsString());
+            map.put("type", subObject.get("dmz").getAsString());
             map.put("lx", subObject.get("dmsm1").getAsString());
             mapLXlist.add(map);
         }

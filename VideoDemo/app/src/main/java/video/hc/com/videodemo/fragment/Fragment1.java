@@ -1,7 +1,10 @@
 package video.hc.com.videodemo.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
@@ -63,10 +67,16 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
     Button bt_pre;
     @BindView(R.id.bt_next)
     Button bt_next;
+    @BindView(R.id.up)
+    ImageView iv_up;
+    @BindView(R.id.down)
+    ImageView iv_down;
 
     GridViewAdapter gridViewAdapter;
     private int position;
     FragmentCallback callback;
+    int count;
+    int pageNo;
     ArrayList<Map<String, String>> listLXdata = new ArrayList<>();
     ArrayList<Map<String, String>> maplist = new ArrayList<>();
 
@@ -76,13 +86,11 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
 
     @Override
     public View getLayoutView(LayoutInflater inflater, ViewGroup container) {
-        Log.d("lylogss", "getLayoutView ");
         return inflater.inflate(R.layout.fragment1, null);
     }
 
     @Override
     public void initView() {
-        Log.d("lylog", "initView");
         listLXdata = HttpService.getInstance().getLXdata(this);
 
         Map<String, String> map = new HashMap<>();
@@ -101,11 +109,19 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
                     int scrollY = view.getScrollY();
                     int height = view.getHeight();
                     int scrollViewMeasuredHeight = sv_leixing.getChildAt(0).getMeasuredHeight();
-                    if (scrollY == 0) {
+                    if (scrollY <100) {
+                        iv_up.setVisibility(View.INVISIBLE);
+                        iv_down.setVisibility(View.VISIBLE);
                         Log.d("lylog", "顶端");
                     }
-                    if ((scrollY + height) == scrollViewMeasuredHeight) {
+                    if ((scrollY + height ) == scrollViewMeasuredHeight) {
+                        iv_down.setVisibility(View.INVISIBLE);
+                        iv_up.setVisibility(View.VISIBLE);
                         Log.d("lylog", "底端");
+                    }
+                    if ((scrollY + height) < scrollViewMeasuredHeight && scrollY > 100) {
+                        iv_down.setVisibility(View.VISIBLE);
+                        iv_up.setVisibility(View.VISIBLE);
                     }
                 }
                 return false;
@@ -113,13 +129,13 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
         });
         bt_pre.setOnClickListener(this);
         bt_next.setOnClickListener(this);
+        iv_down.setOnClickListener(this);
+        iv_up.setOnClickListener(this);
         gv_video.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String url = maplist.get(position).get("url");
-                Log.d("lylog11", "  position =" + position);
-                Log.d("lylog11", "  url =" + url);
                 callback.urlCallback(url);
             }
         });
@@ -128,6 +144,10 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
     private void addview(RadioGroup radioGroup) {
         List<String> list = getListSize();
         Log.d("lylog1", " mapLXlist = " + list.toString());
+        if (list.size() < 6) {
+            iv_down.setVisibility(View.INVISIBLE);
+            iv_up.setVisibility(View.INVISIBLE);
+        }
         for (int i = 0; i < list.size(); i++) {
             RadioButton button = new RadioButton(getContext());
             button.setButtonDrawable(0);
@@ -135,8 +155,7 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
             final String s = list.get(i).toString();
             button.setGravity(Gravity.CENTER);
             button.setTextSize(10);
-            button.setWidth(206);
-            button.setHeight(67);
+            button.setBackground(getResources().getDrawable(R.mipmap.bg_lx_unclick));
             button.setText(s);
 
             if (i == 0) {
@@ -182,10 +201,9 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
         if (flag) {
             radioButton.setTextColor(Color.YELLOW);
             radioButton.setBackground(getResources().getDrawable(R.mipmap.bg_lx_clicked));
-            Log.d("lylog", "w h" + radioButton.getWidth() + "  " + radioButton.getHeight());
         } else {
             radioButton.setTextColor(Color.WHITE);
-            radioButton.setBackground(null);
+            radioButton.setBackground(getResources().getDrawable(R.mipmap.bg_lx_unclick));
         }
     }
 
@@ -205,23 +223,63 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
         return list;
     }
 
+    int time = 1;
+
     @Override
     public void onClick(View v) {
+        int i = Math.abs(radioGroup.getCheckedRadioButtonId());
         switch (v.getId()) {
             case R.id.bt_pre:
+                if (time > 1) {
+                    time--;
+                } else {
+                    time = 1;
+                }
+                Map<String, String> map2 = new HashMap();
+
+                map2.put("type",i+"");
+                map2.put("curPage",time+"");
+                HttpService.getInstance().getURLData(map2, this);
                 break;
             case R.id.bt_next:
+                if (time < count/4) {
+                    time ++;
+                } else {
+                    time = (count+pageNo -1)/4;
+                }
+                Map<String, String> map1 = new HashMap();
+                map1.put("type",i+"");
+                map1.put("curPage",time+"");
+                HttpService.getInstance().getURLData(map1, this);
+                break;
+            case R.id.up:
+                sv_leixing.fullScroll(ScrollView.FOCUS_UP);
+                iv_up.setVisibility(View.INVISIBLE);
+                iv_down.setVisibility(View.VISIBLE);
+                break;
+            case R.id.down:
+                sv_leixing.fullScroll(ScrollView.FOCUS_DOWN);
+                iv_down.setVisibility(View.INVISIBLE);
+                iv_up.setVisibility(View.VISIBLE);
                 break;
         }
     }
 
     @Override
     public void success(Response response) {
+        maplist.clear();
         String result = null;
         try {
             result = response.body().string();
             maplist = JsonUtils.getIncetence().getMapData(result);
-            Log.d("lylog1", "maplist =" + maplist.size());
+            if (maplist.size() > 0) {
+                count = Integer.valueOf(maplist.get(0).get("count"));
+                pageNo = Integer.valueOf(maplist.get(0).get("pageNo"));
+
+            } else {
+                count = pageNo = 0;
+            }
+
             Message msg = new Message();
             msg.what = RESULT_SUCESS;
             mHandler.sendMessage(msg);
@@ -264,6 +322,17 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
                 case RESULT_SUCESS:
                     gridViewAdapter = new GridViewAdapter(getContext(), maplist);
                     gv_video.setAdapter(gridViewAdapter);
+
+                    if (0 < count && count < 4) {
+                        count = 1;
+                        tv_page_number.setText(pageNo + "/" + count);
+                    } else if (count == 0) {
+                        count = 0;
+                        tv_page_number.setText(pageNo + "/" + count);
+                    } else {
+                        tv_page_number.setText(pageNo + "/" + (count + pageNo - 1) / 4);
+                    }
+
                     break;
                 case RESULT_LX_SUCESS:
                     addview(radioGroup);
@@ -275,6 +344,6 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        callback =(FragmentCallback) getActivity();
+        callback = (FragmentCallback) getActivity();
     }
 }

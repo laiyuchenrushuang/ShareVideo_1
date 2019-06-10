@@ -43,6 +43,8 @@ public class HttpService {
     private ArrayList<Map<String, String>> hashMaps = new ArrayList<>();
     private ArrayList<Map<String, String>> datalist = new ArrayList<>();
 
+    ArrayList<String> urlList = new ArrayList<>();
+
     public static HttpService getInstance() {
         if (mHttpService == null) {
             synchronized (HttpService.class) {
@@ -77,21 +79,6 @@ public class HttpService {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     callback.success(response);
-//                    String result = response.body().string();
-//
-//                    JsonParser parser = new JsonParser();  //创建JSON解析器
-//                    JsonObject object = (JsonObject) parser.parse(result);
-//                    JsonObject data = (JsonObject) object.get("data");
-//                    JsonArray listarray = data.getAsJsonArray("list");
-//                    Log.d("lylog", " listarray = " + listarray.size());
-//                    for (int i = 0; i < listarray.size(); i++) {
-//                        Map<String, String> map = new HashMap<>();
-//                        JsonObject subObject = listarray.get(i).getAsJsonObject();
-//                        map.put("url", subObject.get("url").getAsString());
-//                        map.put("theme", subObject.get("theme").getAsString());
-//                        datalist.add(map);
-//                    }
-//
                 } else {
                     callback.failed(response.body().string());
                     Log.d("lylogNet", " response error2");
@@ -105,17 +92,47 @@ public class HttpService {
         Map<String, String> map = new HashMap<>();
         map.put("id", "0");
         map.put("url", "http://bjcdn2.vod.migucloud.com/mgc_transfiles/200010145/2019/5/19/2EFBSUWNbMUSHXxvBeSQz/cld640p/video_2EFBSUWNbMUSHXxvBeSQz_cld640p.m3u8");
-//        map.put("url","http://mirror.aarnet.edu.au/pub/TED-talks/911Mothers_2010W-480p.mp4");
         Map<String, String> map1 = new HashMap<>();
         map1.put("id", "1");
         map1.put("url", "http://bjcdn2.vod.migucloud.com/mgc_transfiles/200010145/2019/5/19/1EYo9UNOF95HCK30a3mHY/cld640p/video_1EYo9UNOF95HCK30a3mHY_cld640p.m3u8");
         urlList.add(map);
         urlList.add(map1);
+        //getAllurlonline();
         return urlList;
     }
 
+    private static void getAllurlonline() {
+
+        String url = "http://192.168.0.53:8085/jyptdbctl/video/getVideoPage?&curPage=1&pageSize=100";
+        OkHttpClient okHttpClient = new OkHttpClient();
+        final Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Call call = okHttpClient.newCall(request);
+
+
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("lylogNet", " getLXdata response error1");
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+
+
+                } else {
+
+                }
+
+            }
+        });//得到Response 对象
+    }
+
+
     public ArrayList<Map<String, String>> getLXdata(final HttpService.HttpServiceLX callback) {
-        String url = "http://192.168.0.53:8089/electricPaymentInterface/admin/code/selectCodeByDMLB?xtlb=50&dmlb=0011";
+        String url = "http://192.168.0.53:8085/jyptdbctl/admin/code/selectCodeByDMLB?xtlb=50&dmlb=0011";
         OkHttpClient okHttpClient = new OkHttpClient();
         final Request request = new Request.Builder()
                 .url(url)

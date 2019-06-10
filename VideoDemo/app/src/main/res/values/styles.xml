@@ -41,7 +41,7 @@
 
     <style name="next_pager" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="android:textSize">9sp</item>
+        <item name="android:textSize">10sp</item>
         <item name="android:gravity">center</item>
     </style>
 </resources>

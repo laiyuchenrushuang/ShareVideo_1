@@ -34,6 +34,7 @@ public class ToolActivity extends BeseActivity implements View.OnClickListener {
     private void initEvent() {
 
         findViewById(R.id.bt_back).setOnClickListener(this);
+        findViewById(R.id.bt_cancel).setOnClickListener(this);
     }
 
     private void initwebview() {
@@ -60,6 +61,13 @@ public class ToolActivity extends BeseActivity implements View.OnClickListener {
             case R.id.bt_back:
                 finish();
                break;
+            case R.id.bt_cancel:
+                if (webview.canGoBack()) {
+                    webview.goBack();
+                }else{
+                    finish();
+                }
+                break;
         }
     }
 
