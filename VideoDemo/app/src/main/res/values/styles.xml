@@ -44,4 +44,10 @@
         <item name="android:textSize">10sp</item>
         <item name="android:gravity">center</item>
     </style>
+
+    <style name="apptitle" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:textColor">#e7e8f5</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:gravity">left</item>
+    </style>
 </resources>

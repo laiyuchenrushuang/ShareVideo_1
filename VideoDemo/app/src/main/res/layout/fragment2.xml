@@ -18,7 +18,8 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/gv_video"
         android:layout_marginBottom="0dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout">
 
         <Button
             android:id="@+id/bt_pre"

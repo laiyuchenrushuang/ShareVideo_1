@@ -36,11 +36,12 @@ public class JsonUtils {
         JsonObject object = (JsonObject) parser.parse(result);
         JsonObject data = (JsonObject) object.get("data");
         JsonArray listarray = data.getAsJsonArray("list");
-        Log.d("lylog", " listarray = " + listarray.size());
+        Log.d("lylogr", " listarray = " + listarray.toString());
         for (int i = 0; i < listarray.size(); i++) {
             Map<String, String> map = new HashMap<>();
             JsonObject subObject = listarray.get(i).getAsJsonObject();
             map.put("url", subObject.get("url").getAsString());
+            Log.d("lylogr", " subObject = " + subObject.get("url").getAsString());
             map.put("theme", subObject.get("theme").getAsString());
             map.put("count",data.get("count").getAsString());
             map.put("pageNo",data.get("pageNo").getAsString());
@@ -61,5 +62,13 @@ public class JsonUtils {
             mapLXlist.add(map);
         }
         return mapLXlist;
+    }
+
+
+    public String getTrueUrl(String result) {
+        JsonParser parser = new JsonParser();
+        JsonObject jsons = (JsonObject) parser.parse(result);
+
+        return jsons.get("result").getAsString();
     }
 }

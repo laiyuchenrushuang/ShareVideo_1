@@ -45,12 +45,13 @@ import video.hc.com.videodemo.adapter.GridViewAdapter;
 import video.hc.com.videodemo.base.BaseFragment;
 import video.hc.com.videodemo.upload.HttpService;
 import video.hc.com.videodemo.utils.JsonUtils;
+import video.hc.com.videodemo.utils.Utils;
 
 /**
  * Created by ly on 2019/6/6.
  */
 
-public class Fragment1 extends BaseFragment implements View.OnClickListener, HttpService.HttpServiceResult, HttpService.HttpServiceLX {
+public class Fragment1 extends BaseFragment implements View.OnClickListener, HttpService.HttpServiceResult, HttpService.HttpServiceLX, HttpService.HttpTokenCallback {
 
     private static final int RESULT_SUCESS = 1;
     private static final int RESULT_LX_SUCESS = 2;
@@ -79,6 +80,24 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
     int pageNo;
     ArrayList<Map<String, String>> listLXdata = new ArrayList<>();
     ArrayList<Map<String, String>> maplist = new ArrayList<>();
+    String uid, token;
+
+    ArrayList<String> urlList = new ArrayList<>();
+
+    @Override
+    public void tokenCallback(String uid, String token) {
+        this.uid = uid;
+        this.token = token;
+        Map<String, String> map = new HashMap<>();
+        map.put("type", 1 + "");
+        map.put("curPage", 1 + "");
+        HttpService.getInstance().getURLData(map, this);
+    }
+
+    @Override
+    public void tokenError(String result) {
+
+    }
 
     public interface FragmentCallback {
         void urlCallback(String url);
@@ -92,12 +111,10 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
     @Override
     public void initView() {
         listLXdata = HttpService.getInstance().getLXdata(this);
+        HttpService.getInstance().getTokenData(this, getContext());
 
-        Map<String, String> map = new HashMap<>();
-        map.put("type", 1 + "");
-        map.put("curPage", 1 + "");
-        HttpService.getInstance().getURLData(map, this);
-
+//        HttpService.getInstance().getPostData();
+//        addview(radioGroup);
         initEvent();
     }
 
@@ -109,12 +126,12 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
                     int scrollY = view.getScrollY();
                     int height = view.getHeight();
                     int scrollViewMeasuredHeight = sv_leixing.getChildAt(0).getMeasuredHeight();
-                    if (scrollY <100) {
+                    if (scrollY < 100) {
                         iv_up.setVisibility(View.INVISIBLE);
                         iv_down.setVisibility(View.VISIBLE);
                         Log.d("lylog", "顶端");
                     }
-                    if ((scrollY + height ) == scrollViewMeasuredHeight) {
+                    if ((scrollY + height) == scrollViewMeasuredHeight) {
                         iv_down.setVisibility(View.INVISIBLE);
                         iv_up.setVisibility(View.VISIBLE);
                         Log.d("lylog", "底端");
@@ -134,15 +151,17 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
         gv_video.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                String url = maplist.get(position).get("url");
-                callback.urlCallback(url);
+               String maplistURL =  maplist.get(position).get("url");
+               HttpService.getInstance().getTrueUrl(mHandler,getContext(),uid,token,maplistURL);
+//               String url = urlList.get(position);
+//               callback.urlCallback(url);
             }
         });
     }
 
     private void addview(RadioGroup radioGroup) {
         List<String> list = getListSize();
+
         Log.d("lylog1", " mapLXlist = " + list.toString());
         if (list.size() < 6) {
             iv_down.setVisibility(View.INVISIBLE);
@@ -237,19 +256,19 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
                 }
                 Map<String, String> map2 = new HashMap();
 
-                map2.put("type",i+"");
-                map2.put("curPage",time+"");
+                map2.put("type", i + "");
+                map2.put("curPage", time + "");
                 HttpService.getInstance().getURLData(map2, this);
                 break;
             case R.id.bt_next:
-                if (time < count/4) {
-                    time ++;
+                if (time < count / 4) {
+                    time++;
                 } else {
-                    time = (count+pageNo -1)/4;
+                    time = (count + pageNo - 1) / 4;
                 }
                 Map<String, String> map1 = new HashMap();
-                map1.put("type",i+"");
-                map1.put("curPage",time+"");
+                map1.put("type", i + "");
+                map1.put("curPage", time + "");
                 HttpService.getInstance().getURLData(map1, this);
                 break;
             case R.id.up:
@@ -336,6 +355,13 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
                     break;
                 case RESULT_LX_SUCESS:
                     addview(radioGroup);
+                    break;
+                case Utils.URL_SUCCESS:
+                    String url = (String)msg.obj;
+                    callback.urlCallback(url);
+                    break;
+                case Utils.URL_FAILED:
+                    HttpService.getInstance().getTokenData(Fragment1.this, getContext());//再次请求正确的token
                     break;
             }
         }

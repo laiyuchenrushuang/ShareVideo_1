@@ -5,26 +5,25 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <RelativeLayout
+
+    <ImageView
+        android:id="@+id/iv_gridView_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_video_item">
-
-        <ImageView
-            android:id="@+id/iv_gridView_item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@mipmap/bg_waiting" />
-    </RelativeLayout>
+        android:layout_centerInParent="true"
+        />
 
     <TextView
         android:id="@+id/tv_gridView_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_marginTop="5dp"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:singleLine="true"
+        android:text="配字配字配字配字配字配字配字配字配字配字配字配字"
         android:textSize="10sp"
-        android:text="配字" />
+        />
 
 </LinearLayout>
