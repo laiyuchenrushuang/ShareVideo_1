@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -31,7 +32,7 @@ public class JsonUtils {
     public ArrayList<Map<String, String>> mapLXlist = new ArrayList<>();
     public ArrayList<Map<String, String>> maplist = new ArrayList<>();
 
-    public ArrayList<Map<String, String>>  getMapData(String  result) {
+    public ArrayList<Map<String, String>> getMapData(String result) {
         JsonParser parser = new JsonParser();  //创建JSON解析器
         JsonObject object = (JsonObject) parser.parse(result);
         JsonObject data = (JsonObject) object.get("data");
@@ -43,8 +44,8 @@ public class JsonUtils {
             map.put("url", subObject.get("url").getAsString());
             Log.d("lylogr", " subObject = " + subObject.get("url").getAsString());
             map.put("theme", subObject.get("theme").getAsString());
-            map.put("count",data.get("count").getAsString());
-            map.put("pageNo",data.get("pageNo").getAsString());
+            map.put("count", data.get("count").getAsString());
+            map.put("pageNo", data.get("pageNo").getAsString());
             maplist.add(map);
         }
         return maplist;
@@ -70,5 +71,20 @@ public class JsonUtils {
         JsonObject jsons = (JsonObject) parser.parse(result);
 
         return jsons.get("result").getAsString();
+    }
+
+    public ArrayList<String> geturlList(String result) {
+        ArrayList<String> urllist = new ArrayList<>();
+        JsonParser parser = new JsonParser();
+        JsonObject jsons = (JsonObject) parser.parse(result);
+        JsonObject jsonObject = jsons.get("data").getAsJsonObject();
+        JsonArray array = jsonObject.get("list").getAsJsonArray();
+        for (int i = 0; i < array.size(); i++) {
+            JsonElement url = array.get(i).getAsJsonObject().get("url");
+            urllist.add(url.toString());
+        }
+        Log.i("lylog", "   urllist = " + urllist.toString());
+
+        return urllist;
     }
 }

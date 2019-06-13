@@ -25,7 +25,13 @@ public class Utils {
     }
 
     public class NetWorkUtil {
-        public final static String BASE_URL = "http://192.168.0.53:8085/jyptdbctl/video/getVideoPage?";
+
+//        public final static String BASE_IP = "http://192.168.0.53:8085";
+//        public final static String BASE_IP = "http://10.65.37.225:8085";
+        public final static String BASE_IP = "http://xxjf.cdjg.chengdu.gov.cn:8090";
+
+        public final static String BASE_URL = BASE_IP+"/jyptdbctl/video/getVideoPage?";
+
         public final static String BASE_URL_TRUE = "http://bj.migucloud.com/vod2/v1/download_spotviurl?";
 
     }

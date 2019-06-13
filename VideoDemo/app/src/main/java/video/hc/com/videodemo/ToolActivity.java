@@ -1,14 +1,18 @@
 package video.hc.com.videodemo;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -52,6 +56,33 @@ public class ToolActivity extends BeseActivity implements View.OnClickListener {
         webview.loadUrl(url);
         //设置Web视图
         webview.setWebViewClient(new webViewClient());
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                DisplayMetrics outMetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+                int widthPixels = outMetrics.widthPixels;
+                int heightPixels = outMetrics.heightPixels;
+
+                ViewGroup.LayoutParams layoutParams = webview.getLayoutParams();
+                layoutParams.height=heightPixels;
+                layoutParams.width=widthPixels;
+                webview.setLayoutParams(layoutParams);
+
+                int w = View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED);
+                int h = View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED);
+                webview.measure(w, h);
+                int measuredHeight = webview.getMeasuredHeight();
+                int measuredWidth = webview.getMeasuredWidth();
+
+                String ss="屏幕宽高=  "+widthPixels+"-----"+heightPixels+ " webview宽高="+measuredWidth+"---"+measuredHeight;
+
+                Toast.makeText(ToolActivity.this,ss,Toast.LENGTH_LONG).show();
+            }
+        },3000);
+
+
 
     }
 

@@ -20,10 +20,12 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -65,13 +67,16 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
     @BindView(R.id.tv_page_number)
     TextView tv_page_number;
     @BindView(R.id.bt_pre)
-    Button bt_pre;
+    ImageView bt_pre;
     @BindView(R.id.bt_next)
-    Button bt_next;
+    ImageView bt_next;
     @BindView(R.id.up)
     ImageView iv_up;
     @BindView(R.id.down)
     ImageView iv_down;
+
+    @BindView(R.id.fragment1)
+    LinearLayout fragment1;
 
     GridViewAdapter gridViewAdapter;
     private int position;
@@ -151,8 +156,9 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
         gv_video.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-               String maplistURL =  maplist.get(position).get("url");
-               HttpService.getInstance().getTrueUrl(mHandler,getContext(),uid,token,maplistURL);
+                Log.d("lylog"," onItemClick");
+                String maplistURL = maplist.get(position).get("url");
+                HttpService.getInstance().getTrueUrl(mHandler, getContext(), uid, token, maplistURL);
 //               String url = urlList.get(position);
 //               callback.urlCallback(url);
             }
@@ -164,8 +170,8 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
 
         Log.d("lylog1", " mapLXlist = " + list.toString());
         if (list.size() < 6) {
-            iv_down.setVisibility(View.INVISIBLE);
-            iv_up.setVisibility(View.INVISIBLE);
+            iv_down.setVisibility(View.GONE);
+            iv_up.setVisibility(View.GONE);
         }
         for (int i = 0; i < list.size(); i++) {
             RadioButton button = new RadioButton(getContext());
@@ -175,6 +181,7 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
             button.setGravity(Gravity.CENTER);
             button.setTextSize(10);
             button.setBackground(getResources().getDrawable(R.mipmap.bg_lx_unclick));
+            button.setTextColor(Color.parseColor("#00ffff"));
             button.setText(s);
 
             if (i == 0) {
@@ -221,7 +228,7 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
             radioButton.setTextColor(Color.YELLOW);
             radioButton.setBackground(getResources().getDrawable(R.mipmap.bg_lx_clicked));
         } else {
-            radioButton.setTextColor(Color.WHITE);
+            radioButton.setTextColor(Color.parseColor("#00ffff"));
             radioButton.setBackground(getResources().getDrawable(R.mipmap.bg_lx_unclick));
         }
     }
@@ -342,14 +349,14 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
                     gridViewAdapter = new GridViewAdapter(getContext(), maplist);
                     gv_video.setAdapter(gridViewAdapter);
 
-                    if (0 < count && count < 4) {
+                    if (0 < count && count < 10) {
                         count = 1;
                         tv_page_number.setText(pageNo + "/" + count);
                     } else if (count == 0) {
                         count = 0;
                         tv_page_number.setText(pageNo + "/" + count);
                     } else {
-                        tv_page_number.setText(pageNo + "/" + (count + pageNo - 1) / 4);
+                        tv_page_number.setText(pageNo + "/" + (count + pageNo - 1) / 10);
                     }
 
                     break;
@@ -357,11 +364,12 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
                     addview(radioGroup);
                     break;
                 case Utils.URL_SUCCESS:
-                    String url = (String)msg.obj;
+                    String url = (String) msg.obj;
                     callback.urlCallback(url);
                     break;
                 case Utils.URL_FAILED:
                     HttpService.getInstance().getTokenData(Fragment1.this, getContext());//再次请求正确的token
+                    Utils.showToast(getContext(),"请求失败 继续请求");
                     break;
             }
         }

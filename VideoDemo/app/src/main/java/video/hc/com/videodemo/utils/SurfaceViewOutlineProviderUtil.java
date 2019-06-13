@@ -2,6 +2,8 @@ package video.hc.com.videodemo.utils;
 
 import android.graphics.Outline;
 import android.graphics.Rect;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 
@@ -10,6 +12,7 @@ import android.view.ViewOutlineProvider;
  * Created by ly on 2019/6/3.
  */
 
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class SurfaceViewOutlineProviderUtil extends ViewOutlineProvider {
     private float mRadius;
     public SurfaceViewOutlineProviderUtil(float radius) {

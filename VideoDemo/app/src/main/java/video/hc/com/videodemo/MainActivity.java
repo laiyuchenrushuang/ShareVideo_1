@@ -8,9 +8,11 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -19,12 +21,15 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,12 +46,13 @@ import video.hc.com.videodemo.fragment.Fragment1;
 import video.hc.com.videodemo.fragment.Fragment2;
 import video.hc.com.videodemo.fragment.Fragment3;
 import video.hc.com.videodemo.upload.HttpService;
+//import video.hc.com.videodemo.utils.SurfaceViewOutlineProviderUtil;
 import video.hc.com.videodemo.utils.SurfaceViewOutlineProviderUtil;
 import video.hc.com.videodemo.utils.TimeUtils;
 import video.hc.com.videodemo.utils.Utils;
 import video.hc.com.videodemo.view.MySurfaceView;
 
-public class MainActivity extends BeseActivity implements Fragment1.FragmentCallback,View.OnClickListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener, MySurfaceView.GestrueListener {
+public class MainActivity extends BeseActivity implements Fragment1.FragmentCallback, View.OnClickListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener, MySurfaceView.GestrueListener, HttpService.HttpAllCallback {
     @BindView(R.id.video)
     MySurfaceView mSurfaceView;
     @BindView(R.id.button_play)
@@ -81,10 +87,13 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
     @BindView(R.id.scan_progress)
     LinearLayout scan_progress;
 
+    @BindView(R.id.framelaout)
+    FrameLayout fragment;
+
     private static int currentPosition = 0;
     private SurfaceHolder surfaceHolder;
     MediaPlayer mediaPlayer;
-    ArrayList<Map<String, String>> urlList = new ArrayList();
+//    ArrayList<Map<String, String>> urlList = new ArrayList();
     int[] ivProgresslist = {R.mipmap.progress1, R.mipmap.progress2, R.mipmap.progress3, R.mipmap.progress4, R.mipmap.progress5};
     int ivProgressFlag = 0;
     private static int mPrecent = 0;
@@ -93,24 +102,26 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
     private MyPagerAdapter vpAdapter;
     public static ArrayList<Map<String, String>> listdata;
 
+    String uid,token;
+    ArrayList<String> urlist = new ArrayList<>();
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        urlList = HttpService.getUrlList();
+//        urlList = HttpService.getUrlList();
+        HttpService.getInstance().getAllurlonline(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mSurfaceView.registerListener(this);
-        initFragmentData();
 
         initView();
         initEvent();
     }
 
-    private void initFragmentData() {
 
-    }
-
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void initView() {
         mediaPlayer = new MediaPlayer();
         surfaceHolder = mSurfaceView.getHolder();
@@ -118,7 +129,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 Log.i("lylog", "SurfaceHolder 创建");
-                playVideo(urlList.get(mapPosition).get("url"));
+//                playVideo(urlList.get(mapPosition).get("url"));
             }
 
             @Override
@@ -138,8 +149,10 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
         });
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         image_progress.setImageResource(ivProgresslist[ivProgressFlag]);
+
         mSurfaceView.setOutlineProvider(new SurfaceViewOutlineProviderUtil(30));
         mSurfaceView.setClipToOutline(true);
+
         initSeekBarColor();
         FragmentManager fm = getSupportFragmentManager();
         ArrayList<Fragment> listf = new ArrayList<>();
@@ -150,6 +163,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
 
         vpAdapter = new MyPagerAdapter(fm, listf);
         vp_video.setAdapter(vpAdapter);
+
     }
 
     private void initSeekBarColor() {
@@ -177,6 +191,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
             }
+
             @Override
             public void onPageSelected(int position) {
                 if (position == 0) {
@@ -185,6 +200,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
                     showbuttonBgExperience();
                 }
             }
+
             @Override
             public void onPageScrollStateChanged(int state) {
 
@@ -244,7 +260,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
                 loadThirdWeb();
                 break;
             case R.id.iv_error:
-                playVideo(urlList.get(mapPosition).get("url"));
+                HttpService.getInstance().getTrueUrl(mHandler,getApplicationContext(),uid,token,urlist.get(mapPosition).replace("\"",""));
                 mediaPlayer.seekTo(currentPosition);
                 break;
             case R.id.iv_experience:
@@ -313,13 +329,14 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
                 ivProgressFlag = -1;
             }
             mapPosition++;
-            if (urlList.size() > mapPosition) {
+            if (urlist.size() > mapPosition && null != urlist.get(mapPosition).toString()) {
                 lunboFlag = true;
                 Log.d("lylog", "onCompletion mapPosition =" + mapPosition);
-                playVideo(urlList.get(mapPosition).get("url"));
+                HttpService.getInstance().getTrueUrl(mHandler,getApplicationContext(),uid,token,urlist.get(mapPosition).replace("\"",""));
+//                playVideo(urlList.get(mapPosition).get("url"));
             } else {
                 mapPosition = 0;
-                playVideo(urlList.get(mapPosition).get("url"));
+                HttpService.getInstance().getTrueUrl(mHandler,getApplicationContext(),uid,token,urlist.get(mapPosition).replace("\"",""));
 //                bt_play.setVisibility(View.VISIBLE);
             }
         }
@@ -330,7 +347,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
     public void onPrepared(MediaPlayer mp) {
         Utils.canPlay = true;
         gif_networkwait.setVisibility(View.INVISIBLE);
-        iv_error.setVisibility(View.INVISIBLE);
+        iv_error.setVisibility(View.GONE);
         scan_progress.setVisibility(View.INVISIBLE);//++
         //bt_play.setVisibility(View.VISIBLE);
         Log.d("lylog", " onPrepared");
@@ -348,18 +365,24 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
     public boolean onError(MediaPlayer mp, int what, int extra) {
         Log.i("lylog11", "onError = " + what + " extra = " + extra);
         Utils.canPlay = false;
-        Message msg = new Message();
-        msg.what = Utils.VIDEO_ERROR;
-        msg.arg1 = extra;
-        mHandler.sendMessage(msg);
+        if(extra == -2147483648){
+            Message msg = new Message();
+            msg.what = Utils.VIDEO_ERROR;
+            msg.arg1 = extra;
+            mHandler.sendMessage(msg);
+        }
         return false;
     }
 
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
+        if (mp.isPlaying()) {
+            iv_error.setVisibility(View.GONE);
+        }
         mPrecent = percent;
         seekBar.setProgress(percent);
         int currentTime = mp.getCurrentPosition();
+        Log.d("lylog", " percent = " + percent + " currentTime = " + currentTime + " total = " + mediaPlayer.getDuration());
         String time = TimeUtils.calculateTime(currentTime / 1000);
 //        startTime.setText(time);
     }
@@ -433,12 +456,12 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
                     break;
                 case Utils.VIDEO_PRE:
                     Log.d("lylogsss", " VIDEO_PRE");
-                    if (currentPosition > 0) {
-                        currentPosition--;
+                    if (mapPosition > 0) {
+                        mapPosition--;
                     } else {
-                        currentPosition = 0;
+                        mapPosition = 0;
                     }
-                    playVideo(urlList.get(currentPosition).get("url"));
+                    HttpService.getInstance().getTrueUrl(mHandler,getApplicationContext(),uid,token,urlist.get(mapPosition).replace("\"",""));
                     if (ivProgressFlag > 0) {
                         ivProgressFlag--;
                     } else {
@@ -448,12 +471,12 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
                     break;
                 case Utils.VIDEO_NEXT:
                     Log.d("lylogsss", " VIDEO_NEXT");
-                    if (currentPosition < urlList.size() - 1) {
-                        currentPosition++;
+                    if (mapPosition < urlist.size() - 1) {
+                        mapPosition++;
                     } else {
-                        currentPosition = urlList.size() - 1;
+                        mapPosition = urlist.size() - 1;
                     }
-                    playVideo(urlList.get(currentPosition).get("url"));
+                    HttpService.getInstance().getTrueUrl(mHandler,getApplicationContext(),uid,token,urlist.get(mapPosition).replace("\"",""));
 
                     if (ivProgressFlag == 4) {
                         ivProgressFlag = 0;
@@ -469,6 +492,10 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
                     String url = (String) msg.obj;
                     playVideo(url);
                     break;
+                case  Utils.URL_SUCCESS:
+                    String trueurl = (String) msg.obj;
+                    Log.i("lylogsss", " URL_SUCCESS trueurl ="+trueurl);
+                    playVideo(trueurl);
             }
 
         }
@@ -556,9 +583,19 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
 
     @Override
     public void urlCallback(String url) {
+        currentPosition = 0;
+        iv_error.setVisibility(View.GONE);
         Message msg = new Message();
-        msg.obj= url;
+        msg.obj = url;
         msg.what = Utils.FRAGMENT_CALLBACK;
         mHandler.sendMessage(msg);
+    }
+
+    @Override
+    public void tokenCallback(String uid, String token, ArrayList<String> url) {
+        this.uid = uid;
+        this.token = token;
+        this.urlist = url;
+        HttpService.getInstance().getTrueUrl(mHandler,getApplicationContext(),uid,token,urlist.get(mapPosition).replace("\"",""));
     }
 }
