@@ -62,13 +62,13 @@ public class GridViewAdapter extends BaseAdapter {
 
         Map<String, String> map = listmap.get(position);
 
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.bg_waiting);
+        //Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.bg_waiting);
         if (map != null) {
             holder.textView.setText(map.get("theme") + "");
-            holder.imageView.setImageBitmap(bitmap);
+            //holder.imageView.setImageBitmap(bitmap);
         }else {
             holder.textView.setText("null");
-            holder.imageView.setImageBitmap(bitmap);
+            //holder.imageView.setImageBitmap(bitmap);
         }
 
         Log.d("lylog", " sssssss");

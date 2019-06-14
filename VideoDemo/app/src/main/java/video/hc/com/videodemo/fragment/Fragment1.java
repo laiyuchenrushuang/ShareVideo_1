@@ -124,31 +124,31 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
     }
 
     private void initEvent() {
-        sv_leixing.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                    int scrollY = view.getScrollY();
-                    int height = view.getHeight();
-                    int scrollViewMeasuredHeight = sv_leixing.getChildAt(0).getMeasuredHeight();
-                    if (scrollY < 100) {
-                        iv_up.setVisibility(View.INVISIBLE);
-                        iv_down.setVisibility(View.VISIBLE);
-                        Log.d("lylog", "顶端");
-                    }
-                    if ((scrollY + height) == scrollViewMeasuredHeight) {
-                        iv_down.setVisibility(View.INVISIBLE);
-                        iv_up.setVisibility(View.VISIBLE);
-                        Log.d("lylog", "底端");
-                    }
-                    if ((scrollY + height) < scrollViewMeasuredHeight && scrollY > 100) {
-                        iv_down.setVisibility(View.VISIBLE);
-                        iv_up.setVisibility(View.VISIBLE);
-                    }
-                }
-                return false;
-            }
-        });
+//        sv_leixing.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent event) {
+//                if (event.getAction() == MotionEvent.ACTION_MOVE) {
+//                    int scrollY = view.getScrollY();
+//                    int height = view.getHeight();
+//                    int scrollViewMeasuredHeight = sv_leixing.getChildAt(0).getMeasuredHeight();
+//                    if (scrollY < 100) {
+//                        iv_up.setVisibility(View.INVISIBLE);
+//                        iv_down.setVisibility(View.VISIBLE);
+//                        Log.d("lylog", "顶端");
+//                    }
+//                    if ((scrollY + height) == scrollViewMeasuredHeight) {
+//                        iv_down.setVisibility(View.INVISIBLE);
+//                        iv_up.setVisibility(View.VISIBLE);
+//                        Log.d("lylog", "底端");
+//                    }
+//                    if ((scrollY + height) < scrollViewMeasuredHeight && scrollY > 100) {
+//                        iv_down.setVisibility(View.VISIBLE);
+//                        iv_up.setVisibility(View.VISIBLE);
+//                    }
+//                }
+//                return false;
+//            }
+//        });
         bt_pre.setOnClickListener(this);
         bt_next.setOnClickListener(this);
         iv_down.setOnClickListener(this);
@@ -169,24 +169,27 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
         List<String> list = getListSize();
 
         Log.d("lylog1", " mapLXlist = " + list.toString());
-        if (list.size() < 6) {
+        /*if (list.size() < 6) {
             iv_down.setVisibility(View.GONE);
             iv_up.setVisibility(View.GONE);
-        }
+        }*/
+        LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(240,60);
+        params.setMargins(0,10,0,10);
+
         for (int i = 0; i < list.size(); i++) {
             RadioButton button = new RadioButton(getContext());
             button.setButtonDrawable(0);
 
             final String s = list.get(i).toString();
             button.setGravity(Gravity.CENTER);
-            button.setTextSize(10);
-            button.setBackground(getResources().getDrawable(R.mipmap.bg_lx_unclick));
-            button.setTextColor(Color.parseColor("#00ffff"));
+            button.setTextSize(20);
+            //button.setBackground(getResources().getDrawable(R.mipmap.bg_lx_unclick));
+            //button.setTextColor(Color.parseColor("#00ffff"));
+            button.setBackground(getResources().getDrawable(R.drawable.btn_ra_bg));
+            button.setTextColor(getResources().getColorStateList(R.color.btn_ra_color));
             button.setText(s);
-
-            if (i == 0) {
-                setBackground(true, button);
-            }
+            button.setLayoutParams(params);
+            button.setPadding(10,4,10,4);
             radioGroup.addView(button);
 
             radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -200,16 +203,17 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
                     map.put("curPage", 1 + "");
                     HttpService.getInstance().getURLData(map, Fragment1.this);
 
-                    RadioButton radioButton = (RadioButton) (radioGroup.getChildAt(0));
-                    if (position != 1) {
+                   // RadioButton radioButton = (RadioButton) (radioGroup.getChildAt(0));
+                    /*if (position != 1) {
                         setBackground(false, radioButton);
-                    }
+                    }*/
+                    //setBackground(true, radioButton);
 
                 }
             });
 
 
-            button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            /*button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (b) {
@@ -218,7 +222,12 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
                         setBackground(false, (RadioButton) compoundButton);
                     }
                 }
-            });
+            });*/
+        }
+
+        if (radioGroup.getChildCount()>0){
+            RadioButton radioButton = (RadioButton) (radioGroup.getChildAt(0));
+            radioButton.setChecked(true);
         }
 
     }

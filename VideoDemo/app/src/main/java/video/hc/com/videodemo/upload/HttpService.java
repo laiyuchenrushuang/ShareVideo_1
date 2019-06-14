@@ -83,9 +83,9 @@ public class HttpService {
 //        map.put("curPage", "1");
         map.put("pageSize", "10");
         //http://192.168.0.53:8085/jyptdbctl/video/getVideoPage?type=1&curPage=1&pageSize=4
-        Log.d("lylog", "getURLData type = " + map.get("type") + " curPage" + map.get("curPage"));
+        Log.i("lylog", "getURLData type = " + map.get("type") + " curPage" + map.get("curPage"));
         String url = Utils.NetWorkUtil.BASE_URL + "type=" + map.get("type") + "&" + "curPage=" + map.get("curPage") + "&" + "pageSize=" + map.get("pageSize");
-        Log.d("lylogss", " url = " + url);
+        Log.i("lylogss", " url = " + url);
 
         OkHttpClient okHttpClient = new OkHttpClient();
         final Request request = new Request.Builder()

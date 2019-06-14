@@ -57,33 +57,6 @@ public class ToolActivity extends BeseActivity implements View.OnClickListener {
         //设置Web视图
         webview.setWebViewClient(new webViewClient());
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                DisplayMetrics outMetrics = new DisplayMetrics();
-                getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
-                int widthPixels = outMetrics.widthPixels;
-                int heightPixels = outMetrics.heightPixels;
-
-                ViewGroup.LayoutParams layoutParams = webview.getLayoutParams();
-                layoutParams.height=heightPixels;
-                layoutParams.width=widthPixels;
-                webview.setLayoutParams(layoutParams);
-
-                int w = View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED);
-                int h = View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED);
-                webview.measure(w, h);
-                int measuredHeight = webview.getMeasuredHeight();
-                int measuredWidth = webview.getMeasuredWidth();
-
-                String ss="屏幕宽高=  "+widthPixels+"-----"+heightPixels+ " webview宽高="+measuredWidth+"---"+measuredHeight;
-
-                Toast.makeText(ToolActivity.this,ss,Toast.LENGTH_LONG).show();
-            }
-        },3000);
-
-
-
     }
 
     @Override
