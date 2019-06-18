@@ -78,6 +78,8 @@ public class HttpService {
         return mHttpService;
     }
 
+    //每个种类获取的视频列表
+
     public void getURLData(Map map, final HttpService.HttpServiceResult callback) {
 //        map.put("type", "1");
 //        map.put("curPage", "1");

@@ -105,6 +105,8 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
     String uid,token;
     ArrayList<String> urlist = new ArrayList<>();
 
+    private static String beifenTrueUrl = null;
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,7 +145,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
                 Log.i("lylog", "SurfaceHolder 被销毁");
                 if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                     currentPosition = mediaPlayer.getCurrentPosition();
-                    mediaPlayer.stop();
+                    mediaPlayer.pause();
                 }
             }
         });
@@ -243,7 +245,8 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
         switch (v.getId()) {
             case R.id.button_play:
                 Utils.canPlay = true;
-                playButtonClick();
+                Log.i("lylog1"," beifen ="+beifenTrueUrl);
+                playVideo(beifenTrueUrl);
                 break;
             case R.id.video:
                 //doshowProgressState();
@@ -350,7 +353,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
         iv_error.setVisibility(View.GONE);
         scan_progress.setVisibility(View.INVISIBLE);//++
         //bt_play.setVisibility(View.VISIBLE);
-        Log.d("lylog", " onPrepared");
+        Log.i("lylog", " onPrepared");
         getVideoTime();
         resizeSurfaceView();
 //        if (lunboFlag) {
@@ -358,7 +361,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
 //        mp.start();
 //        }
         play(currentPosition);
-        Log.d("lylog11", "onPrepared canPlay =" + Utils.canPlay);
+        Log.i("lylog11", "onPrepared canPlay =" + Utils.canPlay);
     }
 
     @Override
@@ -417,7 +420,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
 
     @Override
     protected void onDestroy() {
-        Log.d("lylog1", "onDestroy");
+        Log.i("lylog1", "onDestroy");
         mediaPlayer.release();
         lunboFlag = false;
         currentPosition = 0;
@@ -438,7 +441,8 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
     protected void onResume() {
         super.onResume();
         bt_play.setVisibility(View.VISIBLE);
-        Log.d("lylog1", " onResume mPrecent =" + mPrecent);
+        Log.i("lylog1", " onResume mPrecent =" + mPrecent);
+       // playVideo(beifenTrueUrl);
         seekBar.setProgress(mPrecent);
         mediaPlayer.seekTo(currentPosition);
     }
@@ -494,6 +498,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
                     break;
                 case  Utils.URL_SUCCESS:
                     String trueurl = (String) msg.obj;
+                    beifenTrueUrl = trueurl;
                     Log.i("lylogsss", " URL_SUCCESS trueurl ="+trueurl);
                     playVideo(trueurl);
             }

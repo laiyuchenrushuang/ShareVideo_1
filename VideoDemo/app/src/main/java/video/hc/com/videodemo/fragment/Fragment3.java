@@ -54,7 +54,7 @@ public class Fragment3 extends BaseFragment {
     private void loadThirdWeb() {
         Intent intent = new Intent();
         intent.setClass(getContext(), ToolActivity.class);
-        intent.putExtra("url", "http://jtzzlm.cdjg.chengdu.gov.cn/cdjj/newcwtapi/newindex?id=888&code=oSthY1d1ccDM1JPaQrLDsihxLbZ&state=STATE");
+        intent.putExtra("url", "http://jtzzlm.cdjg.chengdu.gov.cn/cdjj/newcwtapi/newindex?id=888&code=oSthY1dlwOraHfs-6P4bArh6JpwY&state=STATE");
         startActivity(intent);
     }
 }

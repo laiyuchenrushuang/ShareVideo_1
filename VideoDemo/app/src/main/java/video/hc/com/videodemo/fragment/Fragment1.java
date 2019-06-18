@@ -196,7 +196,7 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
                 @Override
                 public void onCheckedChanged(RadioGroup radioGroup, int position) {
                     maplist.clear();
-                    Log.d("lylog", "onCheckedChanged i = " + position);
+                    Log.i("lylog", "onCheckedChanged i = " + position);
                     setIndex(position);
                     Map<String, String> map = new HashMap<>();
                     map.put("type", position + "");
@@ -383,6 +383,12 @@ public class Fragment1 extends BaseFragment implements View.OnClickListener, Htt
             }
         }
     };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        listLXdata.clear();
+    }
 
     @Override
     public void onAttach(Context context) {
