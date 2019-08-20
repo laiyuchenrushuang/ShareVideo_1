@@ -352,10 +352,22 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
         gif_networkwait.setVisibility(View.INVISIBLE);
         iv_error.setVisibility(View.GONE);
         scan_progress.setVisibility(View.INVISIBLE);//++
+        int duration2 = mediaPlayer.getDuration() / 1000;
+        seekBar.setMax(duration2);
         //bt_play.setVisibility(View.VISIBLE);
         Log.i("lylog", " onPrepared");
         getVideoTime();
         resizeSurfaceView();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    int position = mediaPlayer.getCurrentPosition()/1000;
+                    seekBar.setProgress(position);
+                }
+
+            }
+        }).start();
 //        if (lunboFlag) {
 //            bt_play.setVisibility(View.INVISIBLE);//轮播自动播放不需要播放按钮
 //        mp.start();
@@ -382,11 +394,11 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
         if (mp.isPlaying()) {
             iv_error.setVisibility(View.GONE);
         }
-        mPrecent = percent;
-        seekBar.setProgress(percent);
-        int currentTime = mp.getCurrentPosition();
-        Log.d("lylog", " percent = " + percent + " currentTime = " + currentTime + " total = " + mediaPlayer.getDuration());
-        String time = TimeUtils.calculateTime(currentTime / 1000);
+//        mPrecent = percent;
+//        seekBar.setProgress(percent);
+//        int currentTime = mp.getCurrentPosition();
+//        Log.d("lylog", " percent = " + percent + " currentTime = " + currentTime + " total = " + mediaPlayer.getDuration());
+//        String time = TimeUtils.calculateTime(currentTime / 1000);
 //        startTime.setText(time);
     }
 
@@ -395,10 +407,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             if (fromUser) {
-
-                int duration2 = mediaPlayer.getDuration();
-                currentPosition = (int) (duration2 * ((float) progress) / 100);
-                mediaPlayer.seekTo(currentPosition);
+                mediaPlayer.seekTo(progress * 1000);
                 bt_play.setVisibility(View.INVISIBLE);
                 mediaPlayer.start();
             }
