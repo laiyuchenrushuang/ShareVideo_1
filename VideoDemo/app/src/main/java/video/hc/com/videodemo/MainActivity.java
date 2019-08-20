@@ -106,6 +106,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
     ArrayList<String> urlist = new ArrayList<>();
 
     private static String beifenTrueUrl = null;
+    private boolean progressFlag = true;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -361,7 +362,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(true){
+                while(progressFlag){
                     int position = mediaPlayer.getCurrentPosition()/1000;
                     seekBar.setProgress(position);
                 }
@@ -435,6 +436,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
         currentPosition = 0;
         mapPosition = 0;
         mPrecent = 0;
+        progressFlag = false;
         super.onDestroy();
     }
 
@@ -443,6 +445,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
         Log.d("lylog1", " onPause ");
         currentPosition = mediaPlayer.getCurrentPosition();
         mediaPlayer.stop();
+        progressFlag = false;
         super.onPause();
     }
 
@@ -453,6 +456,7 @@ public class MainActivity extends BeseActivity implements Fragment1.FragmentCall
         Log.i("lylog1", " onResume mPrecent =" + mPrecent);
        // playVideo(beifenTrueUrl);
         seekBar.setProgress(mPrecent);
+        progressFlag = true;
         mediaPlayer.seekTo(currentPosition);
     }
 
